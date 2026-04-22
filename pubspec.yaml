@@ -1,0 +1,39 @@
+name: o_arbitro
+description: O Árbitro — O destino decide.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  phosphor_flutter: ^2.1.0
+  rive: ^0.12.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/fonts/
+
+  fonts:
+    - family: Syne
+      fonts:
+        - asset: assets/fonts/Syne-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Syne-ExtraBold.ttf
+          weight: 800
+    - family: SpaceGrotesk
+      fonts:
+        - asset: assets/fonts/SpaceGrotesk-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/SpaceGrotesk-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/SpaceGrotesk-Bold.ttf
+          weight: 700
