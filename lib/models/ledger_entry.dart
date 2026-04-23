@@ -2,7 +2,7 @@ enum BetStatus { pending, resolved }
 enum ScoreSource { slots, roulette, manual }
 
 sealed class LedgerEntry {
-  LedgerEntry() : timestamp = DateTime.now();
+  LedgerEntry({DateTime? timestamp}) : timestamp = timestamp ?? DateTime.now();
   final DateTime timestamp;
 }
 
@@ -13,6 +13,7 @@ class SocialBet extends LedgerEntry {
     required this.consequence,
     this.status = BetStatus.pending,
     this.loser,
+    super.timestamp,
   });
 
   final String description;
@@ -27,6 +28,7 @@ class SocialBet extends LedgerEntry {
     consequence: consequence,
     status: BetStatus.resolved,
     loser: loserName,
+    timestamp: timestamp,
   );
 }
 
@@ -36,6 +38,7 @@ class Prediction extends LedgerEntry {
     required this.consequence,
     Map<String, bool>? votes,
     this.resolved = false,
+    super.timestamp,
   }) : votes = votes ?? {};
 
   final String description;
@@ -48,6 +51,7 @@ class Prediction extends LedgerEntry {
     consequence: consequence,
     votes: {...votes, player: vote},
     resolved: resolved,
+    timestamp: timestamp,
   );
 
   Prediction resolve() => Prediction(
@@ -55,6 +59,7 @@ class Prediction extends LedgerEntry {
     consequence: consequence,
     votes: votes,
     resolved: true,
+    timestamp: timestamp,
   );
 }
 
@@ -63,6 +68,7 @@ class ScoreEntry extends LedgerEntry {
     required this.player,
     required this.source,
     required this.description,
+    super.timestamp,
   });
 
   final String player;

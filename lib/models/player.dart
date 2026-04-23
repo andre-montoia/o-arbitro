@@ -11,15 +11,12 @@ class Player {
 
   bool get canVeto => vetoTokens > 0;
 
-  Player useVeto() => Player(
-    name: name,
-    vetoTokens: vetoTokens - 1,
-    daresCompleted: daresCompleted,
-  );
+  Player useVeto() => _copyWith(vetoTokens: vetoTokens - 1);
+  Player completeDare() => _copyWith(daresCompleted: daresCompleted + 1);
 
-  Player completeDare() => Player(
+  Player _copyWith({int? vetoTokens, int? daresCompleted}) => Player(
     name: name,
-    vetoTokens: vetoTokens,
-    daresCompleted: daresCompleted + 1,
+    vetoTokens: vetoTokens ?? this.vetoTokens,
+    daresCompleted: daresCompleted ?? this.daresCompleted,
   );
 }

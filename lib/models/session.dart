@@ -5,15 +5,16 @@ import 'ledger_entry.dart';
 
 class Session {
   Session({
-    required this.players,
+    required List<Player> players,
     List<SpinResult>? slotsHistory,
     List<RouletteResult>? rouletteHistory,
     List<LedgerEntry>? ledgerEntries,
   })  : assert(players.length >= 2, 'Session requires at least 2 players'),
         assert(players.length <= 8, 'Session allows max 8 players'),
-        slotsHistory = slotsHistory ?? [],
-        rouletteHistory = rouletteHistory ?? [],
-        ledgerEntries = ledgerEntries ?? [];
+        players = List.unmodifiable(players),
+        slotsHistory = List.unmodifiable(slotsHistory ?? []),
+        rouletteHistory = List.unmodifiable(rouletteHistory ?? []),
+        ledgerEntries = List.unmodifiable(ledgerEntries ?? []);
 
   final List<Player> players;
   final List<SpinResult> slotsHistory;
