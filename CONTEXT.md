@@ -7,7 +7,7 @@ Flutter mobile app (iOS + Android) — a party game with 3 mini-games: Social Sl
 **v0.2.0 complete.** All 3 games fully implemented and merged to master. APK released at:
 https://github.com/andre-montoia/o-arbitro/releases/tag/v0.2.0-debug
 
-34 tests passing. Branch `feature/game-mechanics` merged into master.
+34 tests passing. Branch `feature/game-mechanics` merged into master. ScoreHud component added.
 
 ## Key files
 - `lib/main.dart` — app entry, theme wiring
