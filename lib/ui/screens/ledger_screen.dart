@@ -22,6 +22,7 @@ class _LedgerScreenState extends State<LedgerScreen> {
   _Filter _filter = _Filter.todos;
 
   void _showNewEntry(BuildContext context) {
+    final sessionState = SessionState.of(context);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -31,7 +32,11 @@ class _LedgerScreenState extends State<LedgerScreen> {
           top: Radius.circular(AppSpacing.modalRadius),
         ),
       ),
-      builder: (_) => const NewLedgerEntrySheet(),
+      builder: (_) => SessionState(
+        session: sessionState.session,
+        onSessionChanged: sessionState.onSessionChanged,
+        child: const NewLedgerEntrySheet(),
+      ),
     );
   }
 

@@ -12,6 +12,7 @@ class LobbyScreen extends StatelessWidget {
   const LobbyScreen({super.key});
 
   void _showSetup(BuildContext context) {
+    final sessionState = SessionState.of(context);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -19,34 +20,45 @@ class LobbyScreen extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.modalRadius)),
       ),
-      builder: (_) => const PlayerSetupSheet(),
+      builder: (_) => SessionState(
+        session: sessionState.session,
+        onSessionChanged: sessionState.onSessionChanged,
+        child: const PlayerSetupSheet(),
+      ),
     );
   }
 
   void _confirmReset(BuildContext context) {
+    final sessionState = SessionState.of(context);
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text('Nova Sessão?', style: AppTextStyles.heading),
-        content: Text('Todos os dados da sessão atual serão apagados.',
-          style: AppTextStyles.body),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('CANCELAR', style: AppTextStyles.button.copyWith(
-              color: AppColors.textMuted)),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              SessionState.of(context).endSession();
-              _showSetup(context);
-            },
-            child: Text('CONFIRMAR', style: AppTextStyles.button.copyWith(
-              color: AppColors.danger)),
-          ),
-        ],
+      builder: (ctx) => SessionState(
+        session: sessionState.session,
+        onSessionChanged: sessionState.onSessionChanged,
+        child: AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text('Nova Sessão?', style: AppTextStyles.heading),
+          content: Text('Todos os dados da sessão atual serão apagados.',
+              style: AppTextStyles.body),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('CANCELAR',
+                  style:
+                      AppTextStyles.button.copyWith(color: AppColors.textMuted)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                sessionState.endSession();
+                _showSetup(context);
+              },
+              child: Text('CONFIRMAR',
+                  style:
+                      AppTextStyles.button.copyWith(color: AppColors.danger)),
+            ),
+          ],
+        ),
       ),
     );
   }

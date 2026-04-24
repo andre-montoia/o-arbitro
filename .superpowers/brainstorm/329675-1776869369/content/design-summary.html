@@ -1,0 +1,102 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0d0d1a; --surface: #13132a; --surface2: #1e1e3a;
+    --purple: #7c3aed; --purple-light: #a855f7; --pink: #ec4899;
+    --text: #ffffff; --muted: #a0a0c0;
+  }
+  body { font-family: 'Space Grotesk', sans-serif; }
+  .section { margin-bottom: 28px; }
+  .section-label { font-size: 10px; letter-spacing: 2px; color: var(--purple-light); text-transform: uppercase; margin-bottom: 12px; font-weight: 700; }
+  .swatch-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .swatch { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .swatch-block { width: 48px; height: 48px; border-radius: 8px; }
+  .swatch-name { font-size: 9px; color: var(--muted); text-align: center; }
+  .swatch-hex { font-size: 9px; color: #555; }
+  .token-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .token-table td { padding: 6px 10px; border-bottom: 1px solid #1e1e3a; color: var(--muted); }
+  .token-table td:first-child { color: var(--text); font-weight: 600; width: 40%; }
+  .token-table td code { background: #1e1e3a; color: var(--purple-light); padding: 1px 5px; border-radius: 3px; font-size: 10px; }
+  .typo-demo { margin-bottom: 8px; }
+  .typo-demo .label { font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; align-items: center; }
+  .btn { padding: 9px 20px; border-radius: 100px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: 'Space Grotesk', sans-serif; display: inline-block; }
+  .btn-primary { background: linear-gradient(135deg,#7c3aed,#ec4899); color: #fff; }
+  .btn-secondary { background: rgba(124,58,237,0.15); color: var(--purple-light); border: 1px solid rgba(168,85,247,0.3); }
+  .btn-ghost { background: var(--surface2); color: var(--muted); }
+  .glass-card { background: rgba(124,58,237,0.08); border: 1px solid rgba(168,85,247,0.2); border-radius: 12px; backdrop-filter: blur(8px); padding: 14px; }
+  .check { color: var(--purple-light); margin-right: 6px; }
+  .confirmed { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 13px; color: var(--muted); }
+  .confirmed strong { color: var(--text); }
+</style>
+
+<h2>O Árbitro — Design System Summary</h2>
+<p class="subtitle">All decisions confirmed. Ready to write the spec.</p>
+
+<div class="section">
+  <div class="section-label">Colour Palette</div>
+  <div class="swatch-row">
+    <div class="swatch"><div class="swatch-block" style="background:#0d0d1a;border:1px solid #333;"></div><div class="swatch-name">BG Primary</div><div class="swatch-hex">#0d0d1a</div></div>
+    <div class="swatch"><div class="swatch-block" style="background:#13132a;"></div><div class="swatch-name">Surface</div><div class="swatch-hex">#13132a</div></div>
+    <div class="swatch"><div class="swatch-block" style="background:#1e1e3a;"></div><div class="swatch-name">Surface 2</div><div class="swatch-hex">#1e1e3a</div></div>
+    <div class="swatch"><div class="swatch-block" style="background:#7c3aed;"></div><div class="swatch-name">Purple</div><div class="swatch-hex">#7c3aed</div></div>
+    <div class="swatch"><div class="swatch-block" style="background:#a855f7;"></div><div class="swatch-name">Purple Light</div><div class="swatch-hex">#a855f7</div></div>
+    <div class="swatch"><div class="swatch-block" style="background:#ec4899;"></div><div class="swatch-name">Pink Accent</div><div class="swatch-hex">#ec4899</div></div>
+    <div class="swatch"><div class="swatch-block" style="background:#f59e0b;"></div><div class="swatch-name">Gold (Rare)</div><div class="swatch-hex">#f59e0b</div></div>
+    <div class="swatch"><div class="swatch-block" style="background:#10b981;"></div><div class="swatch-name">Success</div><div class="swatch-hex">#10b981</div></div>
+    <div class="swatch"><div class="swatch-block" style="background:#ef4444;"></div><div class="swatch-name">Danger</div><div class="swatch-hex">#ef4444</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Typography</div>
+  <div class="typo-demo">
+    <div class="label">Display — Syne 800</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:28px;color:#fff;line-height:1.1;">Roleta do Destino</div>
+  </div>
+  <div class="typo-demo">
+    <div class="label">Heading — Syne 700</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:#fff;">Social Slots · Absurdity Ledger</div>
+  </div>
+  <div class="typo-demo">
+    <div class="label">Body — Space Grotesk 500</div>
+    <div style="font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:14px;color:var(--muted);">Quem paga a conta esta noite? Gira a roleta e decide o destino.</div>
+  </div>
+  <div class="typo-demo">
+    <div class="label">Label / Caption — Space Grotesk 700</div>
+    <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:11px;color:var(--purple-light);letter-spacing:1.5px;text-transform:uppercase;">Em Destaque · Popular · Novo</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Components</div>
+  <div class="btn-row">
+    <div class="btn btn-primary">GIRAR</div>
+    <div class="btn btn-secondary">Veto</div>
+    <div class="btn btn-ghost">Cancelar</div>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <div class="glass-card" style="width:130px;">
+      <div style="font-size:24px;margin-bottom:6px;">🎰</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:#fff;">Social Slots</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px;">Consequências</div>
+    </div>
+    <div class="glass-card" style="width:130px;">
+      <div style="font-size:24px;margin-bottom:6px;">🎡</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:#fff;">Roleta</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px;">Destino</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Confirmed Decisions</div>
+  <div class="confirmed"><span class="check">✓</span><div><strong>Palette:</strong> Neon Púrpura — midnight navy base, violet + pink gradient accents</div></div>
+  <div class="confirmed"><span class="check">✓</span><div><strong>Typography:</strong> Syne (display/headings) + Space Grotesk (body/UI)</div></div>
+  <div class="confirmed"><span class="check">✓</span><div><strong>Component style:</strong> Glass & Gradient — frosted glass cards, pill buttons, violet-to-pink gradients</div></div>
+  <div class="confirmed"><span class="check">✓</span><div><strong>Lobby layout:</strong> Grid Destacado — one featured module large, two secondary</div></div>
+  <div class="confirmed"><span class="check">✓</span><div><strong>Stack:</strong> Flutter (single codebase iOS+Android), Firebase backend</div></div>
+  <div class="confirmed"><span class="check">✓</span><div><strong>Market:</strong> PT-PT, Margem Sul / Setúbal, 18–35</div></div>
+</div>

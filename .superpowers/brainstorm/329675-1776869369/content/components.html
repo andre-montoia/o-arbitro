@@ -1,0 +1,138 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0d0d1a;
+    --surface: #13132a;
+    --surface2: #1e1e3a;
+    --purple: #7c3aed;
+    --purple-light: #a855f7;
+    --pink: #ec4899;
+    --text: #ffffff;
+    --muted: #a0a0c0;
+    --border: #7c3aed33;
+  }
+  body { font-family: 'Space Grotesk', sans-serif; }
+
+  .preview-section { margin-bottom: 28px; }
+  .preview-label { font-size: 10px; letter-spacing: 2px; color: var(--purple-light); text-transform: uppercase; margin-bottom: 12px; }
+
+  /* Style card */
+  .style-card {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .style-card:hover { border-color: var(--purple); }
+  .style-card.selected { border-color: var(--purple-light); box-shadow: 0 0 0 2px #a855f733; }
+  .style-badge { font-size: 10px; letter-spacing: 2px; color: var(--purple-light); text-transform: uppercase; margin-bottom: 14px; font-family: 'Space Grotesk', sans-serif; }
+
+  /* Buttons */
+  .btn-primary-sharp { background: linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; padding:10px 24px; border-radius:6px; font-weight:700; font-size:14px; display:inline-block; cursor:pointer; letter-spacing:0.5px; }
+  .btn-primary-pill { background: linear-gradient(135deg,#7c3aed,#ec4899); color:#fff; padding:10px 24px; border-radius:100px; font-weight:700; font-size:14px; display:inline-block; cursor:pointer; letter-spacing:0.5px; }
+  .btn-primary-neon { background: transparent; color:#a855f7; padding:9px 22px; border-radius:8px; font-weight:700; font-size:14px; display:inline-block; cursor:pointer; border:1.5px solid #a855f7; box-shadow: 0 0 12px #7c3aed66; letter-spacing:0.5px; }
+  .btn-ghost { background: var(--surface2); color: var(--muted); padding:10px 24px; border-radius:6px; font-weight:500; font-size:14px; display:inline-block; cursor:pointer; }
+
+  /* Cards */
+  .game-card-sharp { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; width:140px; display:inline-block; }
+  .game-card-glow { background:var(--surface); border:1px solid #7c3aed55; border-radius:12px; padding:16px; width:140px; display:inline-block; box-shadow: 0 0 20px #7c3aed22, inset 0 1px 0 #ffffff11; }
+  .game-card-glass { background: rgba(124,58,237,0.08); border:1px solid rgba(168,85,247,0.2); border-radius:12px; padding:16px; width:140px; display:inline-block; backdrop-filter:blur(8px); }
+
+  .card-icon { font-size:28px; margin-bottom:8px; }
+  .card-title { font-family:'Syne',sans-serif; font-weight:800; font-size:14px; color:var(--text); margin-bottom:4px; }
+  .card-sub { font-size:11px; color:var(--muted); }
+
+  .flex-row { display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap; }
+</style>
+
+<h2>O Árbitro — Component Style</h2>
+<p class="subtitle">Same colours and fonts, three different feels. Pick the one that fits the vibe.</p>
+
+<!-- Option A: Sharp & Bold -->
+<div class="style-card" data-choice="a" onclick="toggleSelect(this)">
+  <div class="style-badge">A — Sharp & Bold</div>
+  <div class="preview-section">
+    <div class="preview-label">Buttons</div>
+    <div class="flex-row">
+      <div class="btn-primary-sharp">GIRAR</div>
+      <div class="btn-ghost">Veto</div>
+    </div>
+  </div>
+  <div class="preview-section">
+    <div class="preview-label">Module Cards</div>
+    <div class="flex-row">
+      <div class="game-card-sharp">
+        <div class="card-icon">🎰</div>
+        <div class="card-title">Social Slots</div>
+        <div class="card-sub">Consequências</div>
+      </div>
+      <div class="game-card-sharp">
+        <div class="card-icon">🎡</div>
+        <div class="card-title">Roleta</div>
+        <div class="card-sub">Destino</div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:#555;margin-top:4px;">Flat, hard edges. Maximum contrast. Serious and direct — like a real casino app.</div>
+</div>
+
+<!-- Option B: Glow & Depth -->
+<div class="style-card" data-choice="b" onclick="toggleSelect(this)">
+  <div class="style-badge">B — Glow & Depth</div>
+  <div class="preview-section">
+    <div class="preview-label">Buttons</div>
+    <div class="flex-row">
+      <div class="btn-primary-neon">GIRAR</div>
+      <div class="btn-ghost">Veto</div>
+    </div>
+  </div>
+  <div class="preview-section">
+    <div class="preview-label">Module Cards</div>
+    <div class="flex-row">
+      <div class="game-card-glow">
+        <div class="card-icon">🎰</div>
+        <div class="card-title">Social Slots</div>
+        <div class="card-sub">Consequências</div>
+      </div>
+      <div class="game-card-glow">
+        <div class="card-icon">🎡</div>
+        <div class="card-title">Roleta</div>
+        <div class="card-sub">Destino</div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:#555;margin-top:4px;">Neon outlines, purple glow halos. Packdraw-closest. Energetic, electric feel.</div>
+</div>
+
+<!-- Option C: Glass & Gradient -->
+<div class="style-card" data-choice="c" onclick="toggleSelect(this)">
+  <div class="style-badge">C — Glass & Gradient</div>
+  <div class="preview-section">
+    <div class="preview-label">Buttons</div>
+    <div class="flex-row">
+      <div class="btn-primary-pill">GIRAR</div>
+      <div class="btn-ghost">Veto</div>
+    </div>
+  </div>
+  <div class="preview-section">
+    <div class="preview-label">Module Cards</div>
+    <div class="flex-row">
+      <div class="game-card-glass">
+        <div class="card-icon">🎰</div>
+        <div class="card-title">Social Slots</div>
+        <div class="card-sub">Consequências</div>
+      </div>
+      <div class="game-card-glass">
+        <div class="card-icon">🎡</div>
+        <div class="card-title">Roleta</div>
+        <div class="card-sub">Destino</div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:#555;margin-top:4px;">Frosted glass surfaces, pill buttons, violet-to-pink gradients. Modern, premium, Instagram-ready.</div>
+</div>

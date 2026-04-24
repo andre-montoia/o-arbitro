@@ -1,0 +1,72 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;800&family=Rajdhani:wght@500;700&family=Oswald:wght@600;700&family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+<style>
+  .typo-card {
+    background: #0d0d1a;
+    border: 1px solid #7c3aed33;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .typo-card:hover { border-color: #7c3aed; }
+  .typo-card.selected { border-color: #a855f7; box-shadow: 0 0 0 2px #a855f733; }
+  .typo-badge { font-size: 10px; letter-spacing: 2px; color: #a855f7; text-transform: uppercase; margin-bottom: 10px; font-family: Inter, sans-serif; }
+  .typo-preview-label { color: #555; font-size: 11px; font-family: Inter, sans-serif; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
+  .typo-row { margin-bottom: 14px; }
+  .chip { display: inline-block; background: #1e1e3a; color: #a0a0c0; font-size: 10px; padding: 3px 8px; border-radius: 4px; font-family: Inter, sans-serif; margin-top: 6px; }
+</style>
+
+<h2>O Árbitro — Typography</h2>
+<p class="subtitle">Each pair: display font for headings + body font for UI text. All free on Google Fonts.</p>
+
+<!-- Option A -->
+<div class="typo-card" data-choice="a" onclick="toggleSelect(this)">
+  <div class="typo-badge">Option A</div>
+  <div class="typo-row">
+    <div class="typo-preview-label">Display / Headings</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:#fff;line-height:1;letter-spacing:2px;">ROLETA DO DESTINO</div>
+    <span class="chip">Bebas Neue — Bold, all-caps, aggressive</span>
+  </div>
+  <div class="typo-row">
+    <div class="typo-preview-label">Body / UI</div>
+    <div style="font-family:'Inter',sans-serif;font-weight:600;font-size:15px;color:#a0a0c0;">Quem paga a conta esta noite? <span style="color:#a855f7;">Gira a roleta.</span></div>
+    <span class="chip">Inter — Clean, modern, legible</span>
+  </div>
+  <div style="font-family:Inter,sans-serif;font-size:12px;color:#555;margin-top:4px;">Packdraw energy. Maximum impact, clean readability on small screens.</div>
+</div>
+
+<!-- Option B -->
+<div class="typo-card" data-choice="b" onclick="toggleSelect(this)">
+  <div class="typo-badge">Option B</div>
+  <div class="typo-row">
+    <div class="typo-preview-label">Display / Headings</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:36px;color:#fff;line-height:1.1;letter-spacing:-1px;">Roleta do Destino</div>
+    <span class="chip">Syne — Geometric, editorial, modern</span>
+  </div>
+  <div class="typo-row">
+    <div class="typo-preview-label">Body / UI</div>
+    <div style="font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:15px;color:#a0a0c0;">Quem paga a conta esta noite? <span style="color:#a855f7;">Gira a roleta.</span></div>
+    <span class="chip">Space Grotesk — Techy, personality, still readable</span>
+  </div>
+  <div style="font-family:Inter,sans-serif;font-size:12px;color:#555;margin-top:4px;">More design-forward. Feels like a modern EU startup, less gamer.</div>
+</div>
+
+<!-- Option C -->
+<div class="typo-card" data-choice="c" onclick="toggleSelect(this)">
+  <div class="typo-badge">Option C</div>
+  <div class="typo-row">
+    <div class="typo-preview-label">Display / Headings</div>
+    <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:40px;color:#fff;line-height:1;letter-spacing:3px;">ROLETA DO DESTINO</div>
+    <span class="chip">Rajdhani — Military/tech, angular, high-energy</span>
+  </div>
+  <div class="typo-row">
+    <div class="typo-preview-label">Body / UI</div>
+    <div style="font-family:'Inter',sans-serif;font-weight:400;font-size:15px;color:#a0a0c0;">Quem paga a conta esta noite? <span style="color:#a855f7;">Gira a roleta.</span></div>
+    <span class="chip">Inter — Grounded contrast to the aggressive display</span>
+  </div>
+  <div style="font-family:Inter,sans-serif;font-size:12px;color:#555;margin-top:4px;">High tension, action feel. Great for the slot machine and roulette screens.</div>
+</div>
