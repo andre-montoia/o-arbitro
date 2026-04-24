@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../models/dare_state.dart';
 import '../../models/player.dart';
+import '../../services/haptic_service.dart';
+import '../../services/sound_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text_styles.dart';
@@ -41,7 +43,7 @@ class DareVoteCard extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.lg),
-          Text('O GRUPO DECIDE', style: AppTextStyles.label),
+          const Text('O GRUPO DECIDE', style: AppTextStyles.label),
           const SizedBox(height: AppSpacing.sm),
           ...voters.map((voter) {
             final vote = dareState.votes[voter.name];
@@ -56,13 +58,21 @@ class DareVoteCard extends StatelessWidget {
                     _VoteButton(
                       icon: Icons.thumb_up_rounded,
                       color: AppColors.success,
-                      onTap: () => onVote(voter.name, true),
+                      onTap: () {
+                        SoundService.instance.play(GameSound.votePass);
+                        HapticService.instance.light();
+                        onVote(voter.name, true);
+                      },
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     _VoteButton(
                       icon: Icons.thumb_down_rounded,
                       color: AppColors.danger,
-                      onTap: () => onVote(voter.name, false),
+                      onTap: () {
+                        SoundService.instance.play(GameSound.voteFail);
+                        HapticService.instance.medium();
+                        onVote(voter.name, false);
+                      },
                     ),
                   ] else
                     Icon(

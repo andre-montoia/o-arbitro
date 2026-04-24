@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../models/dare_state.dart';
+import '../../services/haptic_service.dart';
+import '../../services/sound_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text_styles.dart';
@@ -40,6 +42,10 @@ class _DareTimerCardState extends State<DareTimerCard>
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
       setState(() => _remaining--);
+      
+      SoundService.instance.play(GameSound.timerTick);
+      HapticService.instance.light();
+
       if (_remaining <= 0) {
         _ticker.cancel();
         widget.onTimerEnd();

@@ -3,6 +3,8 @@ import '../../data/dares.dart';
 import '../../models/dare_state.dart';
 import '../../models/session_state.dart';
 import '../../models/spin_result.dart';
+import '../../services/haptic_service.dart';
+import '../../services/sound_service.dart';
 import '../components/arbitro_badge.dart';
 import '../components/arbitro_button.dart';
 import '../components/dare_timer_card.dart';
@@ -42,6 +44,8 @@ class _SlotsScreenState extends State<SlotsScreen> {
           intensity: _intensityLabel(result.intensity),
         );
 
+    SoundService.instance.play(GameSound.dareAssign);
+    HapticService.instance.heavy();
     state.onSessionChanged(updatedSession);
   }
 
@@ -125,7 +129,11 @@ class _SlotsScreenState extends State<SlotsScreen> {
                   child: ArbitroButton(
                     label: 'RECUSAR',
                     variant: ArbitroButtonVariant.secondary,
-                    onPressed: () => ss.refuseDare(dareState.player),
+                    onPressed: () {
+                      SoundService.instance.play(GameSound.punishment);
+                      HapticService.instance.vibrate();
+                      ss.refuseDare(dareState.player);
+                    },
                   ),
                 ),
               ],
@@ -161,7 +169,11 @@ class _SlotsScreenState extends State<SlotsScreen> {
                 const SizedBox(height: AppSpacing.xxl),
                 ArbitroButton(
                   label: 'GIRAR',
-                  onPressed: () => _machineKey.currentState?.spin(),
+                  onPressed: () {
+                    SoundService.instance.play(GameSound.spin);
+                    HapticService.instance.medium();
+                    _machineKey.currentState?.spin();
+                  },
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 const Text('JOGADORES', style: AppTextStyles.label),
