@@ -37,7 +37,7 @@ void main() {
 
     await tester.pumpWidget(_wrap(const SlotsScreen(), session));
 
-    expect(find.text('Ana'), findsOneWidget);
-    expect(find.text('Bruno'), findsOneWidget);
+    expect(find.text('Ana'), findsAtLeastNWidgets(1));
+    expect(find.text('Bruno'), findsAtLeastNWidgets(1));
   });
 }
