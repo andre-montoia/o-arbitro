@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../data/dares.dart';
-import '../../models/ledger_entry.dart';
+import '../../models/dare_state.dart';
 import '../../models/session_state.dart';
 import '../../models/spin_result.dart';
+import '../components/arbitro_badge.dart';
 import '../components/arbitro_button.dart';
-import '../components/dare_result_card.dart';
+import '../components/dare_timer_card.dart';
+import '../components/dare_vote_card.dart';
+import '../components/glass_card.dart';
 import '../components/slot_machine.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
@@ -19,74 +22,126 @@ class SlotsScreen extends StatefulWidget {
 
 class _SlotsScreenState extends State<SlotsScreen> {
   final GlobalKey<SlotMachineState> _machineKey = GlobalKey<SlotMachineState>();
-  SpinResult? _pendingResult;
-  String? _currentDare;
 
   void _handleSpinResult(SpinResult result) {
-    setState(() {
-      _currentDare = Dares.random(result.category, result.intensity);
-      _pendingResult = SpinResult(
-        player: result.player,
-        category: result.category,
-        intensity: result.intensity,
-        dare: _currentDare!,
-        accepted: false,
-      );
-    });
+    final state = SessionState.of(context);
+    final session = state.session!;
+    final dareText = Dares.random(result.category, result.intensity);
+
+    final updatedSession = session
+        .addSpinResult(SpinResult(
+          player: result.player,
+          category: result.category,
+          intensity: result.intensity,
+          dare: dareText,
+          accepted: true,
+        ))
+        .assignDare(
+          player: result.player,
+          dare: dareText,
+          intensity: _intensityLabel(result.intensity),
+        );
+
+    state.onSessionChanged(updatedSession);
   }
 
-  void _onAccept() {
-    if (_pendingResult == null || _currentDare == null) return;
+  String _intensityLabel(DareIntensity intensity) => switch (intensity) {
+        DareIntensity.casual => 'CASUAL',
+        DareIntensity.ousado => 'OUSADO',
+        DareIntensity.epico => 'ÉPICO',
+      };
+
+  BadgeVariant _intensityBadgeVariant(String intensity) => switch (intensity) {
+        'CASUAL' => BadgeVariant.purple,
+        'OUSADO' => BadgeVariant.pink,
+        'ÉPICO' => BadgeVariant.gold,
+        'CASTIGO' => BadgeVariant.pink,
+        _ => BadgeVariant.purple,
+      };
+
+  Widget _buildDarePhaseUI(SessionState ss, DareState dareState) {
+    switch (dareState.phase) {
+      case DarePhase.assigned:
+      case DarePhase.punishment:
+        return _buildAssignedUI(ss, dareState);
+      case DarePhase.timing:
+        return DareTimerCard(
+          dareState: dareState,
+          onTimerEnd: ss.completeDareAndTriggerVote,
+        );
+      case DarePhase.voting:
+        return DareVoteCard(
+          dareState: dareState,
+          players: ss.session!.players,
+          onVote: ss.submitVote,
+        );
+    }
+  }
+
+  Widget _buildAssignedUI(SessionState ss, DareState dareState) {
+    final isPunishment = dareState.isPunishment || dareState.phase == DarePhase.punishment;
     
-    final state = SessionState.of(context);
-    final finalResult = SpinResult(
-      player: _pendingResult!.player,
-      category: _pendingResult!.category,
-      intensity: _pendingResult!.intensity,
-      dare: _currentDare!,
-      accepted: true,
+    return GlassCard(
+      variant: dareState.intensity == 'ÉPICO' 
+          ? GlassCardVariant.highlighted 
+          : GlassCardVariant.defaultCard,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(dareState.player, style: AppTextStyles.heading),
+              ArbitroBadge(
+                label: isPunishment ? 'CASTIGO' : dareState.intensity,
+                variant: isPunishment ? BadgeVariant.pink : _intensityBadgeVariant(dareState.intensity),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            dareState.dare,
+            style: AppTextStyles.bodyStrong.copyWith(fontSize: 18),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          if (isPunishment)
+            ArbitroButton(
+              label: 'ACEITAR CASTIGO',
+              onPressed: ss.startTimer,
+              fullWidth: true,
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: ArbitroButton(
+                    label: 'COMEÇAR DESAFIO',
+                    onPressed: ss.startTimer,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: ArbitroButton(
+                    label: 'RECUSAR',
+                    variant: ArbitroButtonVariant.secondary,
+                    onPressed: () => ss.refuseDare(dareState.player),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
     );
-
-    state.addSpinResult(finalResult);
-    state.completeDare(_pendingResult!.player);
-    state.addLedgerEntry(ScoreEntry(
-      player: _pendingResult!.player,
-      source: ScoreSource.slots,
-      description: _currentDare!,
-    ));
-
-    setState(() {
-      _pendingResult = null;
-      _currentDare = null;
-    });
-  }
-
-  void _onVeto() {
-    if (_pendingResult == null) return;
-    
-    final state = SessionState.of(context);
-    state.useVeto(_pendingResult!.player);
-    
-    setState(() {
-      _currentDare = Dares.random(_pendingResult!.category, _pendingResult!.intensity);
-      _pendingResult = SpinResult(
-        player: _pendingResult!.player,
-        category: _pendingResult!.category,
-        intensity: _pendingResult!.intensity,
-        dare: _currentDare!,
-        accepted: false,
-      );
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final session = SessionState.of(context).session;
+    final ss = SessionState.of(context);
+    final session = ss.session;
     if (session == null) return const Scaffold(body: Center(child: Text('No session')));
 
-    final player = _pendingResult != null 
-        ? session.playerByName(_pendingResult!.player)
-        : null;
+    final dareState = session.currentDareState;
 
     return Scaffold(
       body: SafeArea(
@@ -97,13 +152,13 @@ class _SlotsScreenState extends State<SlotsScreen> {
             children: [
               const Text('Social Slots', style: AppTextStyles.display),
               const SizedBox(height: AppSpacing.xxl),
-              SlotMachine(
-                key: _machineKey,
-                players: session.players.map((p) => p.name).toList(),
-                onResult: _handleSpinResult,
-              ),
-              const SizedBox(height: AppSpacing.xxl),
-              if (_pendingResult == null) ...[
+              if (dareState == null) ...[
+                SlotMachine(
+                  key: _machineKey,
+                  players: session.players.map((p) => p.name).toList(),
+                  onResult: _handleSpinResult,
+                ),
+                const SizedBox(height: AppSpacing.xxl),
                 ArbitroButton(
                   label: 'GIRAR',
                   onPressed: () => _machineKey.currentState?.spin(),
@@ -124,16 +179,8 @@ class _SlotsScreenState extends State<SlotsScreen> {
                     child: Text(p.name, style: AppTextStyles.caption.copyWith(color: AppColors.textPrimary)),
                   )).toList(),
                 ),
-              ] else if (player != null)
-                DareResultCard(
-                  dare: _currentDare!,
-                  player: _pendingResult!.player,
-                  intensity: _pendingResult!.intensity,
-                  canVeto: player.canVeto,
-                  vetoTokens: player.vetoTokens,
-                  onAccept: _onAccept,
-                  onVeto: _onVeto,
-                ),
+              ] else
+                _buildDarePhaseUI(ss, dareState),
             ],
           ),
         ),
