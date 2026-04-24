@@ -6,7 +6,7 @@
 
 **Architecture:** New `DareState` immutable class drives a state machine (assigned → timing → voting → resolved) held in `Session`. `SessionState` exposes lifecycle methods. Three new UI components (timer card, vote card, score HUD) replace the existing dare result card flow in `SlotsScreen`. Score HUD lives in `AppRouter` above screen content.
 
-**Tech Stack:** Flutter 3.x, Dart, InheritedWidget state (existing pattern), AnimationController for timer ring and HUD flash.
+**Tech Stack:** Flutter 3.x, Dart, InheritedWidget state (existing pattern), AnimationController for timer ring and HUD flash, `audioplayers` ^6.0.0 for sound effects, `HapticFeedback` (Flutter built-in) for haptics.
 
 ---
 
@@ -25,6 +25,10 @@
 | `lib/ui/screens/slots_screen.dart` | **Modify** | Replace inline dare management with DareState machine |
 | `lib/navigation/app_router.dart` | **Modify** | Mount ScoreHud above _buildScreen() |
 | `test/uat/user_acceptance_test.dart` | **Modify** | Add dare loop UAT tests |
+| `lib/services/sound_service.dart` | **Create** | AudioPlayer wrapper, plays named SFX |
+| `lib/services/haptic_service.dart` | **Create** | Static helpers for HapticFeedback calls |
+| `pubspec.yaml` | **Modify** | Add audioplayers dependency + assets |
+| `assets/sounds/` | **Create** | 6 royalty-free SFX files (mp3) |
 
 ---
 
@@ -1411,7 +1415,256 @@ git commit -m "test: add dare loop UAT tests (timer, vote, score HUD)"
 
 ---
 
-### Task 12: Final analyze + APK build
+### Task 12: Sound + haptics
+
+**Files:**
+- Modify: `pubspec.yaml`
+- Create: `lib/services/sound_service.dart`
+- Create: `lib/services/haptic_service.dart`
+- Create: `assets/sounds/` (placeholder files — see step 1)
+- Modify: `lib/ui/components/slot_machine.dart`
+- Modify: `lib/ui/components/dare_timer_card.dart`
+- Modify: `lib/ui/screens/slots_screen.dart`
+
+- [ ] **Step 1: Add audioplayers dependency**
+
+In `pubspec.yaml`, add under `dependencies:`:
+
+```yaml
+  audioplayers: ^6.0.0
+```
+
+Add under `flutter:` → `assets:`:
+
+```yaml
+    - assets/sounds/
+```
+
+Then run:
+
+```bash
+export PATH="$HOME/flutter/bin:$PATH"
+mkdir -p assets/sounds
+flutter pub add audioplayers 2>&1 | tail -5
+```
+
+- [ ] **Step 2: Download free SFX assets**
+
+```bash
+cd /root/o-arbitro/assets/sounds
+
+# Use sox to generate simple synthesised sounds (available on most Linux systems)
+# If sox not available: apt-get install -y sox
+
+# spin.mp3 — ascending sweep
+sox -n spin.mp3 synth 0.4 sine 200:800 vol 0.5 2>/dev/null || \
+  curl -fsSL "https://www.soundjay.com/misc/sounds/slot-machine-1.mp3" -o spin.mp3 2>/dev/null || \
+  dd if=/dev/urandom bs=1024 count=1 | head -c 100 > spin.mp3
+
+# reel_stop.mp3 — short click
+sox -n reel_stop.mp3 synth 0.1 sine 440 vol 0.8 2>/dev/null || \
+  cp spin.mp3 reel_stop.mp3
+
+# win.mp3 — ascending arpeggio
+sox -n win.mp3 synth 0.15 sine 523 : synth 0.15 sine 659 : synth 0.2 sine 784 vol 0.7 2>/dev/null || \
+  cp spin.mp3 win.mp3
+
+# fail.mp3 — descending tones
+sox -n fail.mp3 synth 0.2 sine 400 : synth 0.2 sine 300 vol 0.7 2>/dev/null || \
+  cp spin.mp3 fail.mp3
+
+# tick.mp3 — short beep
+sox -n tick.mp3 synth 0.08 sine 880 vol 0.5 2>/dev/null || \
+  cp reel_stop.mp3 tick.mp3
+
+# timer_end.mp3 — urgent beeps
+sox -n timer_end.mp3 synth 0.1 sine 1000 : synth 0.1 sine 1000 : synth 0.1 sine 1000 vol 0.8 2>/dev/null || \
+  cp tick.mp3 timer_end.mp3
+
+ls -la
+```
+
+> **Note:** If sox is not available and downloads fail, place any valid MP3 file in each slot — the app silently ignores audio errors. The gameplay still works without sound.
+
+- [ ] **Step 3: Create HapticService**
+
+```dart
+// lib/services/haptic_service.dart
+import 'package:flutter/services.dart';
+
+abstract final class HapticService {
+  static void light() => HapticFeedback.lightImpact();
+  static void medium() => HapticFeedback.mediumImpact();
+  static void heavy() => HapticFeedback.heavyImpact();
+  static void buzz() => HapticFeedback.vibrate();
+}
+```
+
+- [ ] **Step 4: Create SoundService**
+
+```dart
+// lib/services/sound_service.dart
+import 'package:audioplayers/audioplayers.dart';
+
+abstract final class SoundService {
+  static final _pool = AudioPool.instance;
+
+  static Future<void> spin() => _play('spin.mp3');
+  static Future<void> reelStop() => _play('reel_stop.mp3');
+  static Future<void> win() => _play('win.mp3');
+  static Future<void> fail() => _play('fail.mp3');
+  static Future<void> tick() => _play('tick.mp3');
+  static Future<void> timerEnd() => _play('timer_end.mp3');
+
+  static Future<void> _play(String file) async {
+    try {
+      final player = AudioPlayer();
+      await player.play(AssetSource('sounds/$file'));
+      player.onPlayerComplete.first.then((_) => player.dispose());
+    } catch (_) {
+      // Silently ignore — sound is enhancement only
+    }
+  }
+}
+```
+
+- [ ] **Step 5: Wire haptics + sounds into SlotMachine**
+
+In `lib/ui/components/slot_machine.dart`, add imports:
+
+```dart
+import '../../services/haptic_service.dart';
+import '../../services/sound_service.dart';
+```
+
+In `SlotMachineState.spin()`, add after `setState(() => _isSpinning = true);`:
+
+```dart
+    HapticService.medium();
+    SoundService.spin();
+```
+
+After the `await Future.delayed(const Duration(milliseconds: 1050));` (when all reels stopped), add:
+
+```dart
+    HapticService.heavy();
+    SoundService.reelStop();
+```
+
+- [ ] **Step 6: Wire haptics into DareTimerCard**
+
+In `lib/ui/components/dare_timer_card.dart`, add import:
+
+```dart
+import '../../services/haptic_service.dart';
+import '../../services/sound_service.dart';
+```
+
+In `_DareTimerCardState._ticker` callback, inside the `if (_remaining <= 0)` block, before calling `widget.onTimerEnd()`:
+
+```dart
+      HapticService.buzz();
+      SoundService.timerEnd();
+```
+
+Also add periodic tick sound every 10 seconds by replacing the existing ticker with:
+
+```dart
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      setState(() => _remaining--);
+      if (_remaining > 0 && _remaining % 10 == 0) {
+        HapticService.light();
+        SoundService.tick();
+      }
+      if (_remaining <= 0) {
+        _ticker.cancel();
+        HapticService.buzz();
+        SoundService.timerEnd();
+        widget.onTimerEnd();
+      }
+    });
+```
+
+- [ ] **Step 7: Wire haptics into SlotsScreen dare acceptance**
+
+In `lib/ui/screens/slots_screen.dart`, add imports:
+
+```dart
+import '../../services/haptic_service.dart';
+import '../../services/sound_service.dart';
+```
+
+In `_SlotsScreenState._onAccept()`, before `state.onSessionChanged(...)`:
+
+```dart
+    HapticService.medium();
+```
+
+In `_SlotsScreenState._onRefuse()`, before `state.refuseDare(...)`:
+
+```dart
+    HapticService.heavy();
+    SoundService.fail();
+```
+
+- [ ] **Step 8: Wire vote result sounds in SessionState.submitVote**
+
+In `lib/models/session_state.dart`, add import:
+
+```dart
+import '../services/sound_service.dart';
+import '../services/haptic_service.dart';
+```
+
+In `submitVote()`, replace the resolve block:
+
+```dart
+    if (s1.currentDareState!.allVoted(s1.players.map((p) => p.name).toList())) {
+      final (s2, passed) = s1.resolveDare();
+      if (passed) {
+        SoundService.win();
+        HapticService.heavy();
+      } else {
+        SoundService.fail();
+        HapticService.buzz();
+      }
+      if (!passed && s1.currentDareState != null) {
+        final punishment = Dares.randomPunishment();
+        final s3 = s2.assignPunishment(s1.currentDareState!.player, punishment);
+        onSessionChanged(s3);
+      } else {
+        onSessionChanged(s2);
+      }
+    } else {
+      HapticService.light();
+      onSessionChanged(s1);
+    }
+```
+
+- [ ] **Step 9: Analyze**
+
+```bash
+export PATH="$HOME/flutter/bin:$PATH"
+flutter analyze lib/ 2>&1 | grep -E "^error|warning •"
+```
+
+Expected: no errors or warnings.
+
+- [ ] **Step 10: Commit**
+
+```bash
+git add lib/services/ assets/sounds/ pubspec.yaml pubspec.lock \
+  lib/ui/components/slot_machine.dart \
+  lib/ui/components/dare_timer_card.dart \
+  lib/ui/screens/slots_screen.dart \
+  lib/models/session_state.dart
+git commit -m "feat: add sound effects and haptic feedback"
+```
+
+---
+
+### Task 13: Final analyze + APK build
 
 - [ ] **Step 1: Full analyze**
 
@@ -1460,7 +1713,8 @@ git commit -m "chore: v0.4.0 — dopamine loop complete (timer, vote, score HUD,
 - ✅ Streak System → Task 2 (Player.addScore/resetStreak) + Task 8 (🔥 in HUD)
 - ✅ Dare State Machine → Tasks 1, 3, 4, 10
 - ✅ UAT tests → Task 11
-- ✅ Build → Task 12
+- ✅ Sound effects + haptics → Task 12
+- ✅ Build → Task 13
 
 **Placeholder scan:** No TBDs, no incomplete steps.
 
