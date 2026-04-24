@@ -9,6 +9,9 @@ import '../components/glass_card.dart';
 import '../components/arbitro_button.dart';
 import '../components/new_ledger_entry_sheet.dart';
 
+// Duration for the slide-in animation when a new entry is added
+const _kEntryAnimDuration = Duration(milliseconds: 400);
+
 enum _Filter { todos, apostas, previsoes, pontuacao }
 
 class LedgerScreen extends StatefulWidget {
@@ -20,6 +23,8 @@ class LedgerScreen extends StatefulWidget {
 
 class _LedgerScreenState extends State<LedgerScreen> {
   _Filter _filter = _Filter.todos;
+  final _listKey = GlobalKey<AnimatedListState>();
+  int _prevEntryCount = 0;
 
   void _showNewEntry(BuildContext context) {
     final sessionState = SessionState.of(context);
@@ -47,6 +52,17 @@ class _LedgerScreenState extends State<LedgerScreen> {
       _Filter.previsoes => entries.whereType<Prediction>().toList(),
       _Filter.pontuacao => entries.whereType<ScoreEntry>().toList(),
     };
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final state = SessionState.of(context);
+    final count = state.session?.ledgerEntries.length ?? 0;
+    if (count > _prevEntryCount && _prevEntryCount > 0) {
+      _listKey.currentState?.insertItem(0, duration: _kEntryAnimDuration);
+    }
+    _prevEntryCount = count;
   }
 
   @override
@@ -106,19 +122,23 @@ class _LedgerScreenState extends State<LedgerScreen> {
             Expanded(
               child: filtered.isEmpty
                   ? Center(
-                      child:
-                          Text('Sem entradas ainda', style: AppTextStyles.body))
-                  : ListView.separated(
+                      child: Text('Sem entradas ainda', style: AppTextStyles.body))
+                  : AnimatedList(
+                      key: _listKey,
                       padding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.screenPadding),
-                      itemCount: filtered.length,
-                      separatorBuilder: (_, __) =>
-                          const SizedBox(height: AppSpacing.sm),
-                      itemBuilder: (ctx, i) {
+                      initialItemCount: filtered.length,
+                      itemBuilder: (ctx, i, animation) {
+                        if (i >= filtered.length) return const SizedBox.shrink();
                         final entry = filtered[i];
                         final globalIndex =
                             state.session!.ledgerEntries.indexOf(entry);
-                        return _EntryCard(entry: entry, index: globalIndex);
+                        return _AnimatedEntryCard(
+                          entry: entry,
+                          index: globalIndex,
+                          animation: animation,
+                          isFirst: i == 0,
+                        );
                       },
                     ),
             ),
@@ -202,6 +222,40 @@ class _FilterChip extends StatelessWidget {
       );
 }
 
+class _AnimatedEntryCard extends StatelessWidget {
+  const _AnimatedEntryCard({
+    required this.entry,
+    required this.index,
+    required this.animation,
+    required this.isFirst,
+  });
+  final LedgerEntry entry;
+  final int index;
+  final Animation<double> animation;
+  final bool isFirst;
+
+  @override
+  Widget build(BuildContext context) {
+    final slide = Tween<Offset>(
+      begin: const Offset(0, -0.5),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
+
+    return Column(
+      children: [
+        SlideTransition(
+          position: slide,
+          child: FadeTransition(
+            opacity: animation,
+            child: _EntryCard(entry: entry, index: index),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+      ],
+    );
+  }
+}
+
 class _EntryCard extends StatelessWidget {
   const _EntryCard({required this.entry, required this.index});
   final LedgerEntry entry;
@@ -217,18 +271,56 @@ class _EntryCard extends StatelessWidget {
   }
 }
 
-class _BetCard extends StatelessWidget {
+class _BetCard extends StatefulWidget {
   const _BetCard({required this.bet, required this.index});
   final SocialBet bet;
   final int index;
 
   @override
+  State<_BetCard> createState() => _BetCardState();
+}
+
+class _BetCardState extends State<_BetCard> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse;
+  late final Animation<double> _pulseAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+    _pulseAnim = Tween<double>(begin: 0.2, end: 1.0).animate(_pulse);
+    if (widget.bet.status == BetStatus.pending) {
+      _pulse.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(_BetCard old) {
+    super.didUpdateWidget(old);
+    if (widget.bet.status == BetStatus.pending && !_pulse.isAnimating) {
+      _pulse.repeat(reverse: true);
+    } else if (widget.bet.status != BetStatus.pending && _pulse.isAnimating) {
+      _pulse.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final state = SessionState.of(context);
     final players = state.session!.players.map((p) => p.name).toList();
+    final isPending = widget.bet.status == BetStatus.pending;
 
-    return GlassCard(
-      variant: bet.status == BetStatus.resolved
+    Widget card = GlassCard(
+      variant: widget.bet.status == BetStatus.resolved
           ? GlassCardVariant.defaultCard
           : GlassCardVariant.highlighted,
       child: Column(
@@ -240,21 +332,21 @@ class _BetCard extends StatelessWidget {
             Text('APOSTA', style: AppTextStyles.label),
             const Spacer(),
             Text(
-              bet.status == BetStatus.pending ? 'PENDENTE' : 'RESOLVIDA',
+              widget.bet.status == BetStatus.pending ? 'PENDENTE' : 'RESOLVIDA',
               style: AppTextStyles.label.copyWith(
-                color: bet.status == BetStatus.pending
+                color: widget.bet.status == BetStatus.pending
                     ? AppColors.gold
                     : AppColors.success,
               ),
             ),
           ]),
           const SizedBox(height: AppSpacing.sm),
-          Text(bet.description, style: AppTextStyles.bodyStrong),
-          Text('Consequência: ${bet.consequence}', style: AppTextStyles.body),
-          if (bet.loser != null)
-            Text('Perdedor: ${bet.loser}',
+          Text(widget.bet.description, style: AppTextStyles.bodyStrong),
+          Text('Consequência: ${widget.bet.consequence}', style: AppTextStyles.body),
+          if (widget.bet.loser != null)
+            Text('Perdedor: ${widget.bet.loser}',
                 style: AppTextStyles.body.copyWith(color: AppColors.danger)),
-          if (bet.status == BetStatus.pending) ...[
+          if (widget.bet.status == BetStatus.pending) ...[
             const SizedBox(height: AppSpacing.sm),
             DropdownButtonFormField<String>(
               hint: Text('Escolher perdedor', style: AppTextStyles.caption),
@@ -274,12 +366,29 @@ class _BetCard extends StatelessWidget {
                   .toList(),
               onChanged: (loser) {
                 if (loser == null) return;
-                state.updateLedgerEntry(index, bet.resolve(loser));
+                state.updateLedgerEntry(widget.index, widget.bet.resolve(loser));
               },
             ),
           ],
         ],
       ),
+    );
+
+    if (!isPending) return card;
+
+    return AnimatedBuilder(
+      animation: _pulseAnim,
+      builder: (_, child) => Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius + 1),
+          border: Border.all(
+            color: AppColors.gold.withOpacity(_pulseAnim.value * 0.6),
+            width: 1.5,
+          ),
+        ),
+        child: child,
+      ),
+      child: card,
     );
   }
 }

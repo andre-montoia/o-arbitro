@@ -8,10 +8,12 @@ class RouletteWheel extends StatefulWidget {
     super.key,
     required this.players,
     required this.onResult,
+    this.onSpinComplete,
   });
 
   final List<String> players;
   final ValueChanged<String> onResult;
+  final ValueChanged<String>? onSpinComplete;
 
   @override
   RouletteWheelState createState() => RouletteWheelState();
@@ -47,7 +49,9 @@ class RouletteWheelState extends State<RouletteWheel> with SingleTickerProviderS
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         if (_winnerIndex != null) {
-          widget.onResult(widget.players[_winnerIndex!]);
+          final winner = widget.players[_winnerIndex!];
+            widget.onResult(winner);
+            widget.onSpinComplete?.call(winner);
         }
       }
     });
