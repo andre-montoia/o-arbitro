@@ -7,11 +7,11 @@ class ScoreHud extends StatefulWidget {
   const ScoreHud({
     super.key,
     required this.players,
-    this.activePlayerName,
+    this.activePlayer,
   });
 
   final List<Player> players;
-  final String? activePlayerName;
+  final String? activePlayer;
 
   @override
   State<ScoreHud> createState() => _ScoreHudState();
@@ -19,64 +19,49 @@ class ScoreHud extends StatefulWidget {
 
 class _ScoreHudState extends State<ScoreHud> with TickerProviderStateMixin {
   final Map<String, AnimationController> _flashes = {};
-  final Map<String, int> _previousScores = {};
 
   @override
   void initState() {
     super.initState();
-    _initializePlayers(widget.players);
+    _initControllers();
   }
 
-  @override
-  void didUpdateWidget(covariant ScoreHud oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.players != oldWidget.players) {
-      _initializePlayers(widget.players);
-      _detectScoreIncreases(oldWidget.players, widget.players);
-    }
-  }
-
-  void _initializePlayers(List<Player> currentPlayers) {
-    for (var player in currentPlayers) {
+  void _initControllers() {
+    for (final player in widget.players) {
       if (!_flashes.containsKey(player.name)) {
         _flashes[player.name] = AnimationController(
           vsync: this,
           duration: const Duration(milliseconds: 600),
         );
-        _previousScores[player.name] = player.score;
       }
     }
-
-    // Clean up controllers for players no longer present
-    _flashes.keys
-        .where((name) => !currentPlayers.any((p) => p.name == name))
-        .toList()
-        .forEach((name) {
-      _flashes[name]?.dispose();
-      _flashes.remove(name);
-      _previousScores.remove(name);
-    });
   }
 
-  void _detectScoreIncreases(
-      List<Player> oldPlayers, List<Player> newPlayers) {
-    for (var newPlayer in newPlayers) {
-      final oldPlayer = oldPlayers.firstWhere(
-        (p) => p.name == newPlayer.name,
-        orElse: () => Player(name: newPlayer.name, score: _previousScores[newPlayer.name] ?? 0),
-      );
+  @override
+  void didUpdateWidget(ScoreHud oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // Ensure we have controllers for all current players
+    _initControllers();
 
-      if (newPlayer.score > oldPlayer.score) {
-        _flashes[newPlayer.name]?.reset();
-        _flashes[newPlayer.name]?.forward();
+    // Detect score increases
+    for (final player in widget.players) {
+      final oldPlayer = oldWidget.players.cast<Player?>().firstWhere(
+            (p) => p?.name == player.name,
+            orElse: () => null,
+          );
+
+      if (oldPlayer != null && player.score > oldPlayer.score) {
+        _flashes[player.name]?.forward(from: 0.0);
       }
-      _previousScores[newPlayer.name] = newPlayer.score;
     }
   }
 
   @override
   void dispose() {
-    _flashes.forEach((_, controller) => controller.dispose());
+    for (final controller in _flashes.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -85,88 +70,114 @@ class _ScoreHudState extends State<ScoreHud> with TickerProviderStateMixin {
     return Container(
       height: 56,
       decoration: const BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.bgPrimary,
         border: Border(
-          bottom: BorderSide(color: AppColors.border),
+          bottom: BorderSide(color: AppColors.border, width: 1),
         ),
       ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: widget.players.length,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         itemBuilder: (context, index) {
           final player = widget.players[index];
-          final bool isActive = player.name == widget.activePlayerName;
+          final isActive = player.name == widget.activePlayer;
+          final controller = _flashes[player.name];
 
-          return AnimatedBuilder(
-            animation: _flashes[player.name]!,
-            builder: (context, child) {
-              final Color flashColor = ColorTween(
-                begin: AppColors.gold.withAlpha(0),
-                end: AppColors.gold.withAlpha((255 * 0.5).toInt()),
-              ).animate(CurvedAnimation(
-                parent: _flashes[player.name]!,
-                curve: Curves.easeOut,
-              )).value!;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            child: AnimatedBuilder(
+              animation: controller ?? kAlwaysDismissedAnimation,
+              builder: (context, child) {
+                final flashValue = controller?.value ?? 0.0;
+                final backgroundColor = flashValue > 0
+                    ? Color.lerp(
+                        Colors.amber.withValues(alpha: 0.4),
+                        Colors.transparent,
+                        flashValue,
+                      )
+                    : Colors.transparent;
 
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                decoration: BoxDecoration(
-                  color: flashColor,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: isActive ? AppColors.purpleLight : Colors.transparent,
-                    width: 2,
+                return Container(
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: isActive ? AppColors.gold : AppColors.border,
+                      width: isActive ? 1.5 : 1,
+                    ),
                   ),
-                ),
-                child: Center(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Player Name
-                      Text(
-                        player.name.length > 8
-                            ? '${player.name.substring(0, 8)}...'
-                            : player.name,
-                        style: AppTextStyles.bodyStrong.copyWith(fontSize: 12),
-                      ),
-                      const SizedBox(width: 4),
-                      // Score
-                      Text(
-                        player.score.toString(),
-                        style: AppTextStyles.heading.copyWith(
-                            color: AppColors.textPrimary, fontSize: 16),
-                      ),
-                      const SizedBox(width: 4),
-                      // Streak Fire Emoji
-                      if (player.isOnFire)
-                        Text('🔥', style: AppTextStyles.body.copyWith(fontSize: 14)),
-                      const SizedBox(width: 4),
-                      // Veto Dots
-                      Row(
-                        children: List.generate(
-                          2,
-                          (dotIndex) => Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 1),
-                            child: Icon(
-                              dotIndex < player.vetoTokens
-                                  ? Icons.circle
-                                  : Icons.circle_outlined,
-                              color: dotIndex < player.vetoTokens
-                                  ? AppColors.purple
-                                  : AppColors.textMuted,
-                              size: 8,
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              player.name.length > 8
+                                  ? '${player.name.substring(0, 8)}...'
+                                  : player.name,
+                              style: AppTextStyles.caption.copyWith(
+                                color: isActive ? AppColors.textPrimary : AppColors.textMuted,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
+                            Row(
+                              children: [
+                                Text(
+                                  '${player.score}',
+                                  style: AppTextStyles.bodyStrong,
+                                ),
+                                if (player.isOnFire)
+                                  const Padding(
+                                    padding: EdgeInsets.only(left: 4),
+                                    child: Text('🔥', style: TextStyle(fontSize: 12)),
+                                  ),
+                              ],
+                            ),
+                          ],
                         ),
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _VetoDot(isFilled: player.vetoTokens >= 1),
+                          const SizedBox(height: 4),
+                          _VetoDot(isFilled: player.vetoTokens >= 2),
+                        ],
                       ),
                     ],
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _VetoDot extends StatelessWidget {
+  const _VetoDot({required this.isFilled});
+
+  final bool isFilled;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isFilled ? AppColors.purple : Colors.transparent,
+        border: Border.all(
+          color: AppColors.purple,
+          width: 1,
+        ),
       ),
     );
   }
