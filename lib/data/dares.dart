@@ -106,4 +106,25 @@ abstract final class Dares {
       ],
     },
   };
+
+  static String randomPunishment() =>
+      _punishment[_random.nextInt(_punishment.length)];
+
+  static const List<String> _punishment = [
+    'Faz 15 flexões agora mesmo sem parar',
+    'Imita o membro do grupo que o grupo escolher durante 2 minutos',
+    'Deixa o grupo escrever uma mensagem no teu telemóvel e enviar a quem quiserem',
+    'Mantém-te em posição de cadeira durante 90 segundos',
+    'Conta uma história embaraçosa verdadeira em menos de 60 segundos',
+    'O grupo escolhe uma palavra — tens de a usar em cada frase durante 3 rondas',
+    'Diz algo genuinamente bonito sobre cada pessoa na sala',
+    'Canta 30 segundos de uma música à escolha do grupo',
+    'Faz o teu melhor discurso de casamento para dois membros do grupo',
+    'Liga para alguém dos teus contactos e diz que tens uma confissão importante — depois desliga',
+    'Deixa o grupo fazer-te um penteado durante 2 minutos',
+    'Fala apenas sussurrando durante as próximas 2 rondas',
+    'Descreve a tua vida amorosa honestamente em 60 segundos',
+    'O grupo escolhe uma pose — ficas assim durante 1 minuto inteiro',
+    'Faz 3 declarações sobre ti mesmo — o grupo vota em qual é mentira',
+  ];
 }
