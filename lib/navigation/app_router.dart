@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/session.dart';
 import '../models/session_state.dart';
+import '../ui/components/score_hud.dart';
 import '../ui/screens/lobby_screen.dart';
 import '../ui/screens/slots_screen.dart';
 import '../ui/screens/roulette_screen.dart';
@@ -26,7 +27,16 @@ class _AppRouterState extends State<AppRouter> {
       session: _session,
       onSessionChanged: _onSessionChanged,
       child: Scaffold(
-        body: _buildScreen(),
+        body: Column(
+          children: [
+            if (_session != null)
+              ScoreHud(
+                players: _session!.players,
+                activePlayer: _session!.currentDareState?.player,
+              ),
+            Expanded(child: _buildScreen()),
+          ],
+        ),
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
             border: Border(top: BorderSide(color: AppColors.border, width: 1)),
