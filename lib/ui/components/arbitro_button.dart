@@ -5,7 +5,7 @@ import '../theme/app_spacing.dart';
 
 enum ArbitroButtonVariant { primary, secondary, ghost, destructive }
 
-class ArbitroButton extends StatelessWidget {
+class ArbitroButton extends StatefulWidget {
   const ArbitroButton({
     super.key,
     required this.label,
@@ -20,23 +20,52 @@ class ArbitroButton extends StatelessWidget {
   final bool fullWidth;
 
   @override
-  Widget build(BuildContext context) {
-    final isDisabled = onPressed == null;
+  State<ArbitroButton> createState() => _ArbitroButtonState();
+}
 
+class _ArbitroButtonState extends State<ArbitroButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 80),
+    reverseDuration: const Duration(milliseconds: 150),
+    lowerBound: 0.0,
+    upperBound: 1.0,
+  );
+    late final Animation<double> _scale = Tween<double>(begin: 1.0, end: 0.95)
+      .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onTapDown(TapDownDetails _) {
+    if (widget.onPressed != null) _controller.forward();
+  }
+
+void _onTapUp(TapUpDetails _) { widget.onPressed?.call(); _controller.reverse(); }
+
+  void _onTapCancel() => _controller.reverse();
+
+  @override
+  Widget build(BuildContext context) {
     Widget child = GestureDetector(
-      onTap: onPressed,
-      child: AnimatedScale(
-        scale: 1.0,
-        duration: const Duration(milliseconds: 100),
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      child: ScaleTransition(
+        scale: _scale,
         child: _buildInner(),
       ),
     );
 
-    if (isDisabled) {
+    if (widget.onPressed == null) {
       child = Opacity(opacity: 0.5, child: child);
     }
 
-    if (fullWidth) {
+    if (widget.fullWidth) {
       child = SizedBox(width: double.infinity, child: child);
     }
 
@@ -44,11 +73,11 @@ class ArbitroButton extends StatelessWidget {
   }
 
   Widget _buildInner() {
-    return switch (variant) {
-      ArbitroButtonVariant.primary     => _GradientButton(label: label),
-      ArbitroButtonVariant.secondary   => _SecondaryButton(label: label),
-      ArbitroButtonVariant.ghost       => _GhostButton(label: label),
-      ArbitroButtonVariant.destructive => _DestructiveButton(label: label),
+    return switch (widget.variant) {
+      ArbitroButtonVariant.primary     => _GradientButton(label: widget.label),
+      ArbitroButtonVariant.secondary   => _SecondaryButton(label: widget.label),
+      ArbitroButtonVariant.ghost       => _GhostButton(label: widget.label),
+      ArbitroButtonVariant.destructive => _DestructiveButton(label: widget.label),
     };
   }
 }
