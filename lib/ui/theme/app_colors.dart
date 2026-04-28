@@ -13,6 +13,9 @@ abstract final class AppColors {
   static const Color gold        = Color(0xFFF59E0B);
   static const Color success     = Color(0xFF10B981);
   static const Color danger      = Color(0xFFEF4444);
+  static const Color red         = Color(0xFFB71C1C);
+  static const Color black       = Color(0xFF212121);
+  static const Color green       = Color(0xFF4CAF50);
 
   static const Color textPrimary  = Color(0xFFFFFFFF);
   static const Color textMuted    = Color(0xFFA0A0C0);

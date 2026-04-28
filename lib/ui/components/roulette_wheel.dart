@@ -25,15 +25,9 @@ class RouletteWheelState extends State<RouletteWheel> with SingleTickerProviderS
   double _currentRotation = 0;
   int? _winnerIndex;
 
-  final List<Color> _segmentColors = const [
-    AppColors.purple,
-    AppColors.pink,
-    Color(0xFF3b82f6),
-    AppColors.success,
-    AppColors.gold,
-    Color(0xFF8b5cf6),
-    Color(0xFFf97316),
-    Color(0xFF06b6d4),
+  final List<Color> _segmentColors = [
+    AppColors.red,
+    AppColors.black,
   ];
 
   @override
@@ -109,21 +103,57 @@ class RouletteWheelState extends State<RouletteWheel> with SingleTickerProviderS
           color: AppColors.gold,
           size: 48,
         ),
-        AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Transform.rotate(
-              angle: _animation.value,
-              child: child,
-            );
-          },
-          child: CustomPaint(
-            size: const Size(280, 280),
-            painter: _WheelPainter(
-              players: widget.players,
-              colors: _segmentColors,
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return Transform.rotate(
+                  angle: _animation.value,
+                  child: child,
+                );
+              },
+              child: CustomPaint(
+                size: const Size(280, 280),
+                painter: _WheelPainter(
+                  players: widget.players,
+                  colors: _segmentColors,
+                ),
+              ),
             ),
-          ),
+            AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                // Calculate ball position based on wheel rotation
+                final wheelRadius = 140.0; // Half of the CustomPaint size
+                final ballRadius = 8.0;
+                final angle = -_animation.value - (pi / 2); // Adjust angle for the pointer
+                final ballX = (wheelRadius - ballRadius - 10) * cos(angle);
+                final ballY = (wheelRadius - ballRadius - 10) * sin(angle);
+
+                return Positioned(
+                  left: wheelRadius + ballX - ballRadius,
+                  top: wheelRadius + ballY - ballRadius,
+                  child: Container(
+                    width: ballRadius * 2,
+                    height: ballRadius * 2,
+                    decoration: const BoxDecoration(
+                      color: AppColors.gold, // Gold ball
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(2, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ],
     );
@@ -148,7 +178,7 @@ class _WheelPainter extends CustomPainter {
 
     final borderPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = AppColors.bgPrimary.withOpacity(0.3)
+      ..color = AppColors.bgPrimary.withAlpha((0.3 * 255).round())
       ..strokeWidth = 2;
 
     for (int i = 0; i < players.length; i++) {
