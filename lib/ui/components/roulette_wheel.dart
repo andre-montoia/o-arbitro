@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui'; // For lerpDouble
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
@@ -19,16 +20,14 @@ class RouletteWheel extends StatefulWidget {
   RouletteWheelState createState() => RouletteWheelState();
 }
 
-class RouletteWheelState extends State<RouletteWheel> with SingleTickerProviderStateMixin {
+class RouletteWheelState extends State<RouletteWheel> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   double _currentRotation = 0;
   int? _winnerIndex;
 
-  final List<Color> _segmentColors = [
-    AppColors.red,
-    AppColors.black,
-  ];
+  late AnimationController _ballController;
+  late Animation<double> _ballAnimation;
 
   @override
   void initState() {
@@ -38,14 +37,29 @@ class RouletteWheelState extends State<RouletteWheel> with SingleTickerProviderS
       duration: const Duration(milliseconds: 3500),
     );
 
+    _ballController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 4200), // Slightly longer than wheel
+    );
+
     _animation = ConstantTween<double>(0).animate(_controller);
+    _ballAnimation = ConstantTween<double>(0).animate(_ballController);
+
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         if (_winnerIndex != null) {
           final winner = widget.players[_winnerIndex!];
-            widget.onResult(winner);
-            widget.onSpinComplete?.call(winner);
+          widget.onResult(winner);
+        }
+      }
+    });
+
+    _ballController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        if (_winnerIndex != null) {
+          final winner = widget.players[_winnerIndex!];
+          widget.onSpinComplete?.call(winner);
         }
       }
     });
@@ -54,11 +68,12 @@ class RouletteWheelState extends State<RouletteWheel> with SingleTickerProviderS
   @override
   void dispose() {
     _controller.dispose();
+    _ballController.dispose();
     super.dispose();
   }
 
   void spin() {
-    if (_controller.isAnimating) return;
+    if (_controller.isAnimating || _ballController.isAnimating) return;
 
     final random = Random();
     _winnerIndex = random.nextInt(widget.players.length);
@@ -91,6 +106,11 @@ class RouletteWheelState extends State<RouletteWheel> with SingleTickerProviderS
 
     _currentRotation = totalRotation % (2 * pi);
     _controller.forward(from: 0);
+
+    // Ball animation
+    _ballAnimation = Tween<double>(begin: 0, end: totalRotation * 1.05) // counter-rotate
+        .animate(CurvedAnimation(parent: _ballController, curve: Curves.easeOutCubic));
+    _ballController.forward(from: 0);
   }
 
   @override
@@ -118,36 +138,38 @@ class RouletteWheelState extends State<RouletteWheel> with SingleTickerProviderS
                 size: const Size(280, 280),
                 painter: _WheelPainter(
                   players: widget.players,
-                  colors: _segmentColors,
                 ),
               ),
             ),
             AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                // Calculate ball position based on wheel rotation
-                final wheelRadius = 140.0; // Half of the CustomPaint size
-                final ballRadius = 8.0;
-                final angle = -_animation.value - (pi / 2); // Adjust angle for the pointer
-                final ballX = (wheelRadius - ballRadius - 10) * cos(angle);
-                final ballY = (wheelRadius - ballRadius - 10) * sin(angle);
+              animation: _ballController,
+              builder: (context, _) {
+                if (!_ballController.isAnimating && !_ballController.isCompleted) {
+                  return const SizedBox.shrink();
+                }
+                final t = _ballController.value;
+                final ballAngle = -_ballAnimation.value; // counter-rotate
+                // ballRadius should lerp from outer edge to winning pocket radius
+                // Wheel segments are drawn at radius * 0.92, inner chrome is radius * 0.94
+                // So ball lands between 0.92 and 0.72 (as per plan instruction example)
+                const double wheelCenter = 140; // half of CustomPaint size
+                final ballSpawnRadius = wheelCenter * 0.92; // outer edge of segments
+                final ballLandRadius = wheelCenter * 0.72; // inner edge where ball settles
 
+                final currentBallRadius = lerpDouble(ballSpawnRadius, ballLandRadius, t)!;
+
+                final cx = wheelCenter + currentBallRadius * cos(ballAngle);
+                final cy = wheelCenter + currentBallRadius * sin(ballAngle);
+            
                 return Positioned(
-                  left: wheelRadius + ballX - ballRadius,
-                  top: wheelRadius + ballY - ballRadius,
+                  left: cx - 6,
+                  top: cy - 6,
                   child: Container(
-                    width: ballRadius * 2,
-                    height: ballRadius * 2,
+                    width: 12, height: 12,
                     decoration: const BoxDecoration(
-                      color: AppColors.gold, // Gold ball
+                      color: Colors.white,
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 4,
-                          offset: Offset(2, 2),
-                        ),
-                      ],
+                      boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 4)],
                     ),
                   ),
                 );
@@ -161,32 +183,42 @@ class RouletteWheelState extends State<RouletteWheel> with SingleTickerProviderS
 }
 
 class _WheelPainter extends CustomPainter {
-  _WheelPainter({required this.players, required this.colors});
+  _WheelPainter({required this.players});
 
   final List<String> players;
-  final List<Color> colors;
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
-    final rect = Rect.fromCircle(center: center, radius: radius);
     final segmentAngle = 2 * pi / players.length;
 
     final paint = Paint()
       ..style = PaintingStyle.fill;
 
-    final borderPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..color = AppColors.bgPrimary.withAlpha((0.3 * 255).round())
-      ..strokeWidth = 2;
+    // Draw outer ring (dark wood) before segments
+    final woodPaint = Paint()
+      ..color = const Color(0xFF2C1810)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, radius, woodPaint);
+
+    // Draw inner chrome ring  
+    final chromePaint = Paint()
+      ..color = const Color(0xFF888899)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, radius * 0.94, chromePaint);
+
+    // Draw segments (at radius * 0.92)
+    final segmentRadius = radius * 0.92;
+    final segmentRect = Rect.fromCircle(center: center, radius: segmentRadius);
 
     for (int i = 0; i < players.length; i++) {
-      paint.color = colors[i % colors.length];
+            final isRed = i % 2 == 0;
+            paint.color = isRed ? const Color(0xFFCC0000) : const Color(0xFF1A1A1A);
       
       // Draw segment
       canvas.drawArc(
-        rect,
+        segmentRect, // Use segmentRect for drawing arcs
         i * segmentAngle,
         segmentAngle,
         true,
@@ -194,18 +226,22 @@ class _WheelPainter extends CustomPainter {
       );
 
       // Draw border
-      canvas.drawArc(
-        rect,
-        i * segmentAngle,
-        segmentAngle,
-        true,
-        borderPaint,
-      );
+      // No explicit border specified in the plan for segments,
+      // but the original code had one. Let's keep a subtle one if desired,
+      // or remove it. For now, removing to match classic roulette visual.
+      // If needed, can add:
+      // final segmentBorderPaint = Paint()
+      //   ..style = PaintingStyle.stroke
+      //   ..color = AppColors.bgPrimary.withAlpha((0.1 * 255).round())
+      //   ..strokeWidth = 1;
+      // canvas.drawArc(segmentRect, i * segmentAngle, segmentAngle, true, segmentBorderPaint);
+
 
       // Draw text
       canvas.save();
       canvas.translate(center.dx, center.dy);
-      canvas.rotate(i * segmentAngle + segmentAngle / 2);
+      // Adjust rotation to align text properly within the segment, considering the outer ring
+      canvas.rotate(i * segmentAngle + segmentAngle / 2 + pi / 2); // Rotate to bring text upright if needed
       
       final textSpan = TextSpan(
         text: players[i],
@@ -219,18 +255,19 @@ class _WheelPainter extends CustomPainter {
         textDirection: TextDirection.ltr,
         textAlign: TextAlign.right,
       );
-      textPainter.layout(minWidth: 0, maxWidth: radius - 30);
+      textPainter.layout(minWidth: 0, maxWidth: segmentRadius - 30);
       
-      // Position text along the radius
+      // Position text along the radius inside the segment
+      canvas.rotate(-pi / 2); // Rotate back to keep text horizontal relative to painter
       textPainter.paint(
         canvas,
-        Offset(radius - textPainter.width - 20, -textPainter.height / 2),
+        Offset(segmentRadius * 0.5 - textPainter.width / 2, -textPainter.height / 2),
       );
       
       canvas.restore();
     }
 
-    // Center circle
+    // Center circle (unchanged from original for now)
     canvas.drawCircle(
       center,
       20,
