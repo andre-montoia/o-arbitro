@@ -23,8 +23,9 @@ class SoundService {
 
   Future<void> play(GameSound sound) async {
     try {
-      final player = _pool[_poolIndex];
-      _poolIndex = (_poolIndex + 1) % _poolSize;
+      final player = _pool[_poolIndex % _poolSize];
+      _poolIndex++;
+      await player.stop();
       await player.play(AssetSource(sound.path));
     } catch (_) {}
   }
