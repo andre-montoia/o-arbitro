@@ -17,100 +17,77 @@ class SlotReel extends StatefulWidget {
   State<SlotReel> createState() => SlotReelState();
 }
 
-class SlotReelState extends State<SlotReel> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late CurvedAnimation _curved;
-  int _startIndex = 0;
-  int _targetIndex = 0;
+class SlotReelState extends State<SlotReel>
+    with SingleTickerProviderStateMixin {
+  static const _itemExtent = 44.0;
+
+  late final FixedExtentScrollController _scrollController;
+  late final AnimationController _animController;
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: widget.duration);
-    _curved = CurvedAnimation(parent: _controller, curve: Curves.decelerate);
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) widget.onComplete?.call();
-    });
+    _scrollController = FixedExtentScrollController(
+      initialItem: 0, // Start at the beginning of the infinite list
+    );
+    _animController = AnimationController(vsync: this, duration: widget.duration);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _scrollController.dispose();
+    _animController.dispose();
     super.dispose();
   }
 
   void spin(int targetIndex) {
-    _startIndex = _currentDisplayIndex.round() % widget.items.length;
-    _targetIndex = targetIndex;
-    _controller.forward(from: 0);
-  }
+    final int totalItems = widget.items.length;
 
-  double get _currentDisplayIndex {
-    final total = widget.items.length;
-    // Scroll at least 2 full rotations plus the distance to target
-    final distance = (_targetIndex - _startIndex + total * 3) % (total * 3);
-    return _startIndex + distance * _curved.value;
+    // Calculate how many items to spin past to reach the target index,
+    // ensuring at least a few full rotations.
+    // We need to determine the offset from the *current* item to the *target* item.
+    final int currentLogicalIndex = _scrollController.selectedItem % totalItems;
+    final int distanceToTarget = (targetIndex - currentLogicalIndex + totalItems) % totalItems;
+
+    // Spin for at least 5 full loops to make the animation clear and realistic
+    final int destinationItem = _scrollController.selectedItem + (5 * totalItems) + distanceToTarget;
+
+    _scrollController.animateToItem(
+      destinationItem,
+      duration: widget.duration,
+      curve: Curves.decelerate, // Keep decelerate for realistic physics
+    ).then((_) {
+      setState(() {
+        _currentIndex = targetIndex;
+      });
+      widget.onComplete?.call();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _curved,
-      builder: (_, __) {
-        final displayIdx = _currentDisplayIndex;
-        final total = widget.items.length;
-        final above = ((displayIdx - 1).floor() % total + total) % total;
-        final center = displayIdx.round() % total;
-        final below = (displayIdx.ceil() % total + total) % total;
-
-        return ClipRect(
-          child: SizedBox(
-          width: double.infinity,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Row above
-              _ReelRow(text: widget.items[above], style: _dimStyle),
-              // Selected row
-              Container(
-                height: 44,
-                decoration: const BoxDecoration(
-                  border: Border.symmetric(
-                    horizontal: BorderSide(color: Color(0x66A855F7), width: 1),
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: Text(widget.items[center], style: _selectedStyle),
-              ),
-              // Row below
-              _ReelRow(text: widget.items[below], style: _dimStyle),
-            ],
-          ),
-          ),
-        );
-      },
+    final totalItems = widget.items.length;
+    return ListWheelScrollView.useDelegate(
+      controller: _scrollController,
+      itemExtent: _itemExtent,
+      physics: const NeverScrollableScrollPhysics(),
+      perspective: 0.003,
+      diameterRatio: 1.8,
+      childDelegate: ListWheelChildBuilderDelegate(
+        childCount: null, // infinite
+        builder: (context, index) {
+          final item = widget.items[index % totalItems];
+          return Center(
+            child: Text(
+              item,
+              style: AppTextStyles.bodyStrong.copyWith(fontSize: 14),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          );
+        },
+      ),
     );
   }
-
-  static const _dimStyle = TextStyle(
-    fontSize: 11,
-    color: Color(0x40FFFFFF),
-    fontWeight: FontWeight.w500,
-  );
-
-  static final _selectedStyle = AppTextStyles.bodyStrong.copyWith(fontSize: 15);
-}
-
-class _ReelRow extends StatelessWidget {
-  const _ReelRow({required this.text, required this.style});
-  final String text;
-  final TextStyle style;
-
-  @override
-  Widget build(BuildContext context) => SizedBox(
-        height: 32,
-        child: Center(
-          child: Text(text, style: style, maxLines: 1, overflow: TextOverflow.ellipsis),
-        ),
-      );
 }

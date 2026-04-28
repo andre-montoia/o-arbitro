@@ -17,16 +17,21 @@ class SoundService {
   SoundService._();
   static final SoundService instance = SoundService._();
 
+  static const _poolSize = 4;
+  final List<AudioPlayer> _pool = List.generate(_poolSize, (_) => AudioPlayer());
+  int _poolIndex = 0;
+
   Future<void> play(GameSound sound) async {
     try {
-      final player = AudioPlayer();
+      final player = _pool[_poolIndex];
+      _poolIndex = (_poolIndex + 1) % _poolSize;
       await player.play(AssetSource(sound.path));
-      // Dispose after finished to avoid memory leaks
-      player.onPlayerComplete.listen((_) {
-        player.dispose();
-      });
-    } catch (e) {
-      // Ignore audio errors in background
+    } catch (_) {}
+  }
+
+  void dispose() {
+    for (final p in _pool) {
+      p.dispose();
     }
   }
 }
