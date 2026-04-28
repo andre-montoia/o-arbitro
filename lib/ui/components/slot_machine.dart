@@ -24,16 +24,36 @@ class SlotMachine extends StatefulWidget {
   State<SlotMachine> createState() => SlotMachineState();
 }
 
-class SlotMachineState extends State<SlotMachine> {
+class SlotMachineState extends State<SlotMachine> with SingleTickerProviderStateMixin {
   final _reel1Key = GlobalKey<SlotReelState>();
   final _reel2Key = GlobalKey<SlotReelState>();
   final _reel3Key = GlobalKey<SlotReelState>();
   bool _isSpinning = false;
   final _random = Random();
 
+  late final AnimationController _lightAnimationController;
+  late final Animation<double> _lightAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _lightAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _lightAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_lightAnimationController);
+  }
+
+  @override
+  void dispose() {
+    _lightAnimationController.dispose();
+    super.dispose();
+  }
+
   Future<void> spin() async {
     if (_isSpinning) return;
     setState(() => _isSpinning = true);
+    _lightAnimationController.forward(from: 0.0);
 
     final playerIdx = _random.nextInt(widget.players.length);
     final categoryIdx = _random.nextInt(_categories.length);
@@ -48,6 +68,7 @@ class SlotMachineState extends State<SlotMachine> {
     // Wait for the longest reel (reel3 duration = 900ms, started 300ms late)
     await Future.delayed(const Duration(milliseconds: 1050));
     setState(() => _isSpinning = false);
+    _lightAnimationController.reverse(from: 1.0);
 
     final categoryStr = _categories[categoryIdx];
     final intensityStr = _intensities[intensityIdx];
@@ -105,63 +126,66 @@ class SlotMachineState extends State<SlotMachine> {
             ]),
           ),
           // Reel window
-          Container(
-            height: 112,
-            decoration: BoxDecoration(
-              color: AppColors.bgPrimary,
-              border: Border.all(color: AppColors.purpleLight, width: 2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            clipBehavior: Clip.hardEdge,
-            child: Stack(
-              children: [
-                // Scanline overlay
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: CustomPaint(painter: _ScanlinePainter()),
+          CustomPaint(
+            painter: _ChromeFramePainter(animation: _lightAnimation),
+            child: Container(
+              height: 112,
+              decoration: BoxDecoration(
+                color: AppColors.bgPrimary,
+                border: Border.all(color: AppColors.purpleLight, width: 2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              clipBehavior: Clip.hardEdge,
+              child: Stack(
+                children: [
+                  // Scanline overlay
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: CustomPaint(painter: _ScanlinePainter()),
+                    ),
                   ),
-                ),
-                // Center highlight bar
-                Positioned(
-                  top: 0, bottom: 0, left: 0, right: 0,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  // Center highlight bar
+                  Positioned(
+                    top: 0, bottom: 0, left: 0, right: 0,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(height: 44, decoration: BoxDecoration(
+                          color: AppColors.purple.withOpacity(0.08),
+                        )),
+                      ],
+                    ),
+                  ),
+                  // Reels
+                  Row(
                     children: [
-                      Container(height: 44, decoration: BoxDecoration(
-                        color: AppColors.purple.withOpacity(0.08),
-                      )),
+                      Expanded(
+                        child: SlotReel(
+                          key: _reel1Key,
+                          items: widget.players,
+                          duration: const Duration(milliseconds: 600),
+                        ),
+                      ),
+                      Container(width: 1, color: AppColors.purple.withOpacity(0.4)),
+                      Expanded(
+                        child: SlotReel(
+                          key: _reel2Key,
+                          items: _categories,
+                          duration: const Duration(milliseconds: 750),
+                        ),
+                      ),
+                      Container(width: 1, color: AppColors.purple.withOpacity(0.4)),
+                      Expanded(
+                        child: SlotReel(
+                          key: _reel3Key,
+                          items: _intensities,
+                          duration: const Duration(milliseconds: 900),
+                        ),
+                      ),
                     ],
                   ),
-                ),
-                // Reels
-                Row(
-                  children: [
-                    Expanded(
-                      child: SlotReel(
-                        key: _reel1Key,
-                        items: widget.players,
-                        duration: const Duration(milliseconds: 600),
-                      ),
-                    ),
-                    Container(width: 1, color: AppColors.purple.withOpacity(0.4)),
-                    Expanded(
-                      child: SlotReel(
-                        key: _reel2Key,
-                        items: _categories,
-                        duration: const Duration(milliseconds: 750),
-                      ),
-                    ),
-                    Container(width: 1, color: AppColors.purple.withOpacity(0.4)),
-                    Expanded(
-                      child: SlotReel(
-                        key: _reel3Key,
-                        items: _intensities,
-                        duration: const Duration(milliseconds: 900),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -199,3 +223,67 @@ class _ScanlinePainter extends CustomPainter {
   @override
   bool shouldRepaint(_ScanlinePainter oldDelegate) => false;
 }
+
+class _ChromeFramePainter extends CustomPainter {
+  final Animation<double> animation;
+
+  _ChromeFramePainter({required this.animation}) : super(repaint: animation);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Base chrome color
+    final basePaint = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color(0xFFCCCCCC), // Light grey
+          Color(0xFF888888), // Darker grey
+          Color(0xFFCCCCCC), // Light grey
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromLTWH(0, 0, size.width, size.height), const Radius.circular(10)),
+      basePaint,
+    );
+
+    // Inner highlight
+    final highlightPaint = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color(0xFFFFFFFF),
+          Color(0xFFAAAAAA),
+          Color(0xFFFFFFFF),
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromLTWH(2, 2, size.width - 4, size.height - 4), const Radius.circular(8)),
+      highlightPaint,
+    );
+
+    // Animated lights (circular)
+    if (animation.value > 0) {
+      final lightPaint = Paint()
+        ..color = AppColors.purpleLight.withOpacity(0.8 * animation.value)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, (5 * animation.value)); // Glowing effect
+
+      final double interval = size.width / 5; // 5 lights
+      for (int i = 0; i < 5; i++) {
+        final double x = (i * interval) + (interval / 2);
+        final double radius = 5 * animation.value;
+        canvas.drawCircle(Offset(x, 10), radius, lightPaint);
+        canvas.drawCircle(Offset(x, size.height - 10), radius, lightPaint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_ChromeFramePainter oldDelegate) {
+    return oldDelegate.animation.value != animation.value;
+  }
+}
+
