@@ -78,6 +78,16 @@ class Session {
     return (_copyWith(players: updated, dareState: null), passed);
   }
 
+  Session resolveToResult(bool passed) {
+    if (currentDareState == null) return this;
+    return _copyWith(
+      dareState: currentDareState!.copyWith(
+        phase: DarePhase.resolved,
+        resolvedPassed: passed,
+      ),
+    );
+  }
+
   Session assignPunishment(String playerName, String punishmentDare) =>
       assignDare(
         player: playerName,

@@ -46,20 +46,28 @@ class SessionState extends InheritedWidget {
     if (session == null) return;
     final s1 = session!.submitVote(voter, pass);
     if (s1.currentDareState!.allVoted(s1.players.map((p) => p.name).toList())) {
-      final (s2, passed) = s1.resolveDare();
-      if (!passed) {
-        final punishment = Dares.randomPunishment();
-        final s3 = s2.assignPunishment(s1.currentDareState!.player, punishment);
-        onSessionChanged(s3);
-      } else {
-        onSessionChanged(s2);
-      }
+      final (s2, passed) = s1.resolveDare(); // still resolves score
+      final s3 = s2.withDareState(
+        s1.currentDareState!.copyWith(phase: DarePhase.resolved, resolvedPassed: passed)
+      );
+      onSessionChanged(s3);
     } else {
       onSessionChanged(s1);
     }
   }
 
-  void completeDareAndTriggerVote() {
+  void dismissResult() {
+    if (session == null) return;
+    final ds = session!.currentDareState;
+    if (ds == null || ds.phase != DarePhase.resolved) return;
+    if (ds.resolvedPassed == false) {
+      final punishment = Dares.randomPunishment();
+      onSessionChanged(session!.assignPunishment(ds.player, punishment));
+    } else {
+      onSessionChanged(session!.withDareState(null));
+    }
+  }
+
     if (session == null) return;
     var s = session!;
     if (s.currentDareState?.phase == DarePhase.assigned) {

@@ -79,6 +79,10 @@ class _SlotsScreenState extends State<SlotsScreen> {
           players: ss.session!.players,
           onVote: ss.submitVote,
         );
+      case DarePhase.resolved:
+        return DareResultOverlay(
+          dareState: dareState,
+        );
     }
   }
 
