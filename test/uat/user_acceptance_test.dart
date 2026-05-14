@@ -187,7 +187,7 @@ void main() {
   group('UAT: Dare timer card', () {
     testWidgets('renders dare text and player name, shows FEITO button', (tester) async {
       bool timerEnded = false;
-      final dareState = DareState(
+      const dareState = DareState(
         player: 'Ana',
         dare: 'Beber um shot',
         intensity: 'OUSADO',
@@ -217,13 +217,13 @@ void main() {
       String? votedVoter;
       bool? votedPass;
 
-      final players = const [
+      const players = [
         Player(name: 'Ana'),
         Player(name: 'Bruno'),
         Player(name: 'Carla'),
       ];
 
-      final dareState = DareState(
+      const dareState = DareState(
         player: 'Ana',
         dare: 'Cantar uma canção',
         intensity: 'CASUAL',
@@ -258,12 +258,12 @@ void main() {
 
   group('UAT: Score HUD', () {
     testWidgets('renders player names, scores, fire emoji, and veto dots', (tester) async {
-      final players = const [
+      const players = [
         Player(name: 'Ana', score: 5, streak: 3, vetoTokens: 2),
         Player(name: 'Bruno', score: 2, streak: 0, vetoTokens: 1),
       ];
 
-      await tester.pumpWidget(MaterialApp(
+      await tester.pumpWidget(const MaterialApp(
         home: Scaffold(
           body: ScoreHud(players: players),
         ),
@@ -279,7 +279,7 @@ void main() {
   });
 
   group('UAT: Dare lifecycle model', () {
-    final players = const [
+    const players = [
       Player(name: 'Ana'),
       Player(name: 'Bruno'),
       Player(name: 'Carla'),

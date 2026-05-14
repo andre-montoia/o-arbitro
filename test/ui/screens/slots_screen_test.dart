@@ -7,7 +7,7 @@ import 'package:o_arbitro/ui/screens/slots_screen.dart';
 import 'package:o_arbitro/ui/theme/app_theme.dart';
 
 void main() {
-  Widget _wrap(Widget child, Session session) {
+  Widget wrap(Widget child, Session session) {
     return SessionState(
       session: session,
       onSessionChanged: (_) {},
@@ -24,7 +24,7 @@ void main() {
       const Player(name: 'Bruno'),
     ]);
 
-    await tester.pumpWidget(_wrap(const SlotsScreen(), session));
+    await tester.pumpWidget(wrap(const SlotsScreen(), session));
 
     expect(find.text('GIRAR'), findsOneWidget);
   });
@@ -35,7 +35,7 @@ void main() {
       const Player(name: 'Bruno'),
     ]);
 
-    await tester.pumpWidget(_wrap(const SlotsScreen(), session));
+    await tester.pumpWidget(wrap(const SlotsScreen(), session));
 
     expect(find.text('Ana'), findsAtLeastNWidgets(1));
     expect(find.text('Bruno'), findsAtLeastNWidgets(1));

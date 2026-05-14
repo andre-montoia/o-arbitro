@@ -83,7 +83,7 @@ class _PlayerSetupSheetState extends State<PlayerSetupSheet> {
           children: [
             const BottomSheetHandle(),
             const SizedBox(height: AppSpacing.md),
-            Text('Jogadores', style: AppTextStyles.heading),
+            const Text('Jogadores', style: AppTextStyles.heading),
             const SizedBox(height: AppSpacing.lg),
             ...List.generate(_controllers.length, (i) => Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.sm),

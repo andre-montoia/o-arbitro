@@ -73,14 +73,14 @@ class _RouletteScreenState extends State<RouletteScreen> {
     final players = SessionState.of(context).session?.players.map((p) => p.name).toList() ?? [];
 
     if (players.isEmpty) {
-      return Scaffold(
+      return const Scaffold(
         backgroundColor: AppColors.bgPrimary,
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.group_off_rounded, color: AppColors.textDisabled, size: 48),
-              const SizedBox(height: 16),
+              Icon(Icons.group_off_rounded, color: AppColors.textDisabled, size: 48),
+              SizedBox(height: 16),
               Text('Inicia uma sessão primeiro', style: AppTextStyles.body),
             ],
           ),

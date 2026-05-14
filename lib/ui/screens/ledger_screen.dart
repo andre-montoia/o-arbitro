@@ -79,7 +79,7 @@ class _LedgerScreenState extends State<LedgerScreen> {
               padding: const EdgeInsets.all(AppSpacing.screenPadding),
               child: Column(
                 children: [
-                  Text('Absurdity Ledger', style: AppTextStyles.heading),
+                  const Text('Absurdity Ledger', style: AppTextStyles.heading),
                   const SizedBox(height: AppSpacing.lg),
                   _Leaderboard(session: state.session!),
                   const SizedBox(height: AppSpacing.lg),
@@ -121,7 +121,7 @@ class _LedgerScreenState extends State<LedgerScreen> {
             ),
             Expanded(
               child: filtered.isEmpty
-                  ? Center(
+                  ? const Center(
                       child: Text('Sem entradas ainda', style: AppTextStyles.body))
                   : AnimatedList(
                       key: _listKey,
@@ -171,7 +171,7 @@ class _Leaderboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Classificação', style: AppTextStyles.label),
+          const Text('Classificação', style: AppTextStyles.label),
           const SizedBox(height: AppSpacing.sm),
           ...sorted.map((p) => Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.xs),
@@ -329,7 +329,7 @@ class _BetCardState extends State<_BetCard> with SingleTickerProviderStateMixin 
           Row(children: [
             const Text('🎲', style: TextStyle(fontSize: 16)),
             const SizedBox(width: AppSpacing.sm),
-            Text('APOSTA', style: AppTextStyles.label),
+            const Text('APOSTA', style: AppTextStyles.label),
             const Spacer(),
             Text(
               widget.bet.status == BetStatus.pending ? 'PENDENTE' : 'RESOLVIDA',
@@ -349,7 +349,7 @@ class _BetCardState extends State<_BetCard> with SingleTickerProviderStateMixin 
           if (widget.bet.status == BetStatus.pending) ...[
             const SizedBox(height: AppSpacing.sm),
             DropdownButtonFormField<String>(
-              hint: Text('Escolher perdedor', style: AppTextStyles.caption),
+              hint: const Text('Escolher perdedor', style: AppTextStyles.caption),
               dropdownColor: AppColors.surface2,
               style: AppTextStyles.bodyStrong,
               decoration: InputDecoration(
@@ -410,7 +410,7 @@ class _PredictionCard extends StatelessWidget {
           Row(children: [
             const Text('🔮', style: TextStyle(fontSize: 16)),
             const SizedBox(width: AppSpacing.sm),
-            Text('PREVISÃO', style: AppTextStyles.label),
+            const Text('PREVISÃO', style: AppTextStyles.label),
             const Spacer(),
             if (prediction.resolved)
               Text('RESOLVIDA',
@@ -423,7 +423,7 @@ class _PredictionCard extends StatelessWidget {
               style: AppTextStyles.body),
           const SizedBox(height: AppSpacing.sm),
           if (!prediction.resolved) ...[
-            Text('Votos:', style: AppTextStyles.label),
+            const Text('Votos:', style: AppTextStyles.label),
             const SizedBox(height: AppSpacing.xs),
             ...players.map((p) {
               final vote = prediction.votes[p];

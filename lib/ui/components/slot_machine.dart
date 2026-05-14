@@ -116,13 +116,13 @@ class SlotMachineState extends State<SlotMachine> with SingleTickerProviderState
         mainAxisSize: MainAxisSize.min,
         children: [
           // Reel labels
-          Padding(
-            padding: const EdgeInsets.only(bottom: 6),
+          const Padding(
+            padding: EdgeInsets.only(bottom: 6),
             child: Row(children: [
               Expanded(child: Center(child: Text('JOGADOR', style: AppTextStyles.label))),
-              const SizedBox(width: 1),
+              SizedBox(width: 1),
               Expanded(child: Center(child: Text('CATEGORIA', style: AppTextStyles.label))),
-              const SizedBox(width: 1),
+              SizedBox(width: 1),
               Expanded(child: Center(child: Text('NÍVEL', style: AppTextStyles.label))),
             ]),
           ),
@@ -198,7 +198,7 @@ class SlotMachineState extends State<SlotMachine> with SingleTickerProviderState
               AnimatedRotation( // The lever
                 turns: _isSpinning ? 0.08 : 0, // Approx 30 degrees = 30/360 = 1/12 = 0.0833
                 duration: const Duration(milliseconds: 200),
-                child: Icon(
+                child: const Icon(
                   Icons.swipe_down_rounded,
                   color: AppColors.purpleLight,
                   size: 48,
@@ -253,10 +253,10 @@ class _ChromeFramePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // Chrome outer border
     final chromePaint = Paint()
-      ..shader = LinearGradient(
+      ..shader = const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: const [Color(0xFF8A8AAA), Color(0xFF2A2A3E), Color(0xFF8A8AAA)], // Changed gradient colors
+        colors: [Color(0xFF8A8AAA), Color(0xFF2A2A3E), Color(0xFF8A8AAA)], // Changed gradient colors
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.stroke
       ..strokeWidth = 6;

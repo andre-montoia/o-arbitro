@@ -73,9 +73,9 @@ class _LoadingIndicator extends StatelessWidget {
   const _LoadingIndicator();
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
-    child: const SizedBox(
+  Widget build(BuildContext context) => const Padding(
+    padding: EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+    child: SizedBox(
       width: 24, // Adjust size as needed
       height: 24, // Adjust size as needed
       child: CircularProgressIndicator(

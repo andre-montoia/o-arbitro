@@ -37,8 +37,8 @@ class LobbyScreen extends StatelessWidget {
         onSessionChanged: sessionState.onSessionChanged,
         child: AlertDialog(
           backgroundColor: AppColors.surface,
-          title: Text('Nova Sessão?', style: AppTextStyles.heading),
-          content: Text('Todos os dados da sessão atual serão apagados.',
+          title: const Text('Nova Sessão?', style: AppTextStyles.heading),
+          content: const Text('Todos os dados da sessão atual serão apagados.',
               style: AppTextStyles.body),
           actions: [
             TextButton(
@@ -135,10 +135,10 @@ class _NoSessionBanner extends StatelessWidget {
       children: [
         const Text('🎮', style: TextStyle(fontSize: 48)),
         const SizedBox(height: AppSpacing.md),
-        Text('Prontos para jogar?', style: AppTextStyles.heading,
+        const Text('Prontos para jogar?', style: AppTextStyles.heading,
           textAlign: TextAlign.center),
         const SizedBox(height: AppSpacing.sm),
-        Text('Adiciona os jogadores para começar',
+        const Text('Adiciona os jogadores para começar',
           style: AppTextStyles.body, textAlign: TextAlign.center),
         const SizedBox(height: AppSpacing.lg),
         ArbitroButton(label: 'INICIAR SESSÃO', onPressed: onStart, fullWidth: true),
@@ -160,7 +160,7 @@ class _SessionBanner extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Sessão activa', style: AppTextStyles.label),
+              const Text('Sessão activa', style: AppTextStyles.label),
               const SizedBox(height: AppSpacing.xs),
               Text(players.join(' · '), style: AppTextStyles.bodyStrong),
             ],
@@ -177,22 +177,22 @@ class _SessionBanner extends StatelessWidget {
 
 class _FeaturedCard extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => GlassCard(
+  Widget build(BuildContext context) => const GlassCard(
     variant: GlassCardVariant.highlighted,
-    padding: const EdgeInsets.all(AppSpacing.xl),
+    padding: EdgeInsets.all(AppSpacing.xl),
     child: Row(
       children: [
-        const Text('🎰', style: TextStyle(fontSize: 48)),
-        const SizedBox(width: AppSpacing.lg),
+        Text('🎰', style: TextStyle(fontSize: 48)),
+        SizedBox(width: AppSpacing.lg),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Social Slots', style: AppTextStyles.heading),
-              const SizedBox(height: AppSpacing.xs),
+              SizedBox(height: AppSpacing.xs),
               Text('Consequências instantâneas', style: AppTextStyles.body),
-              const SizedBox(height: AppSpacing.sm),
-              const ArbitroBadge(label: 'Em Destaque', variant: BadgeVariant.purple),
+              SizedBox(height: AppSpacing.sm),
+              ArbitroBadge(label: 'Em Destaque', variant: BadgeVariant.purple),
             ],
           ),
         ),
@@ -203,33 +203,33 @@ class _FeaturedCard extends StatelessWidget {
 
 class _SecondaryGrid extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => Row(
+  Widget build(BuildContext context) => const Row(
     children: [
       Expanded(
         child: GlassCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('🎡', style: TextStyle(fontSize: 32)),
-              const SizedBox(height: AppSpacing.sm),
-              const Text('Roleta do Destino', style: AppTextStyles.bodyStrong),
-              const SizedBox(height: AppSpacing.xs),
-              const Text('Destino', style: AppTextStyles.caption),
+              Text('🎡', style: TextStyle(fontSize: 32)),
+              SizedBox(height: AppSpacing.sm),
+              Text('Roleta do Destino', style: AppTextStyles.bodyStrong),
+              SizedBox(height: AppSpacing.xs),
+              Text('Destino', style: AppTextStyles.caption),
             ],
           ),
         ),
       ),
-      const SizedBox(width: AppSpacing.md),
+      SizedBox(width: AppSpacing.md),
       Expanded(
         child: GlassCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('📜', style: TextStyle(fontSize: 32)),
-              const SizedBox(height: AppSpacing.sm),
-              const Text('Absurdity Ledger', style: AppTextStyles.bodyStrong),
-              const SizedBox(height: AppSpacing.xs),
-              const Text('Apostas', style: AppTextStyles.caption),
+              Text('📜', style: TextStyle(fontSize: 32)),
+              SizedBox(height: AppSpacing.sm),
+              Text('Absurdity Ledger', style: AppTextStyles.bodyStrong),
+              SizedBox(height: AppSpacing.xs),
+              Text('Apostas', style: AppTextStyles.caption),
             ],
           ),
         ),

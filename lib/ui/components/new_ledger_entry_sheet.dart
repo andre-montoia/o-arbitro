@@ -78,7 +78,7 @@ class _NewLedgerEntrySheetState extends State<NewLedgerEntrySheet> {
         children: [
           const BottomSheetHandle(),
           const SizedBox(height: AppSpacing.md),
-          Text('Nova Entrada', style: AppTextStyles.heading),
+          const Text('Nova Entrada', style: AppTextStyles.heading),
           const SizedBox(height: AppSpacing.lg),
           Row(
             children: [

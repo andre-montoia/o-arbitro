@@ -61,7 +61,7 @@ class SlotReelState extends State<SlotReel> {
         ),
       ),
       child: ShaderMask(
-        shaderCallback: (bounds) => LinearGradient(
+        shaderCallback: (bounds) => const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
@@ -70,7 +70,7 @@ class SlotReelState extends State<SlotReel> {
             Colors.transparent,
             Colors.black,
           ],
-          stops: const [0.0, 0.25, 0.75, 1.0],
+          stops: [0.0, 0.25, 0.75, 1.0],
         ).createShader(bounds),
         blendMode: BlendMode.dstOut,
         child: ListWheelScrollView.useDelegate(

@@ -153,8 +153,8 @@ class RouletteWheelState extends State<RouletteWheel> with TickerProviderStateMi
                 // Wheel segments are drawn at radius * 0.92, inner chrome is radius * 0.94
                 // So ball lands between 0.92 and 0.72 (as per plan instruction example)
                 const double wheelCenter = 140; // half of CustomPaint size
-                final ballSpawnRadius = wheelCenter * 0.92; // outer edge of segments
-                final ballLandRadius = wheelCenter * 0.72; // inner edge where ball settles
+                const ballSpawnRadius = wheelCenter * 0.92; // outer edge of segments
+                const ballLandRadius = wheelCenter * 0.72; // inner edge where ball settles
 
                 final currentBallRadius = lerpDouble(ballSpawnRadius, ballLandRadius, t)!;
 
