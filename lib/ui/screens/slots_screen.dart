@@ -24,6 +24,9 @@ class SlotsScreen extends StatefulWidget {
 
 class _SlotsScreenState extends State<SlotsScreen> {
   final GlobalKey<SlotMachineState> _machineKey = GlobalKey<SlotMachineState>();
+  String? _announcedPlayer;
+  int _currentPlayerIndex = 0;
+
 
   void _handleSpinResult(SpinResult result) {
     final state = SessionState.of(context);
@@ -47,7 +50,36 @@ class _SlotsScreenState extends State<SlotsScreen> {
     SoundService.instance.play(GameSound.dareAssign);
     HapticService.instance.heavy();
     state.onSessionChanged(updatedSession);
+    _updateCurrentPlayerIndex(result.player);
   }
+
+  void _updateCurrentPlayerIndex(String currentPlayerName) {
+    final session = SessionState.of(context).session!;
+    final index = session.players.indexWhere((p) => p.name == currentPlayerName);
+    if (index != -1) {
+      _currentPlayerIndex = (index + 1) % session.players.length;
+    }
+  }
+
+
+
+  Future<void> _doSpin() async {
+    final sessionState = SessionState.of(context);
+    if (sessionState.session == null) return;
+
+    final session = sessionState.session!;
+    final nextPlayer = session.players[_currentPlayerIndex % session.players.length];
+    _currentPlayerIndex++;
+    setState(() => _announcedPlayer = nextPlayer.name);
+    await Future.delayed(const Duration(milliseconds: 1500));
+    if (!mounted) return;
+    setState(() => _announcedPlayer = null);
+
+    SoundService.instance.play(GameSound.spin);
+    HapticService.instance.medium();
+    _machineKey.currentState?.spin();
+  }
+
 
   String _intensityLabel(DareIntensity intensity) => switch (intensity) {
         DareIntensity.casual => 'CASUAL',
@@ -131,13 +163,15 @@ class _SlotsScreenState extends State<SlotsScreen> {
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: ArbitroButton(
-                    label: 'RECUSAR',
-                    variant: ArbitroButtonVariant.secondary,
-                    onPressed: () {
-                      SoundService.instance.play(GameSound.punishment);
-                      HapticService.instance.vibrate();
-                      ss.refuseDare(dareState.player);
-                    },
+                    label: 'VETAR (${ss.session!.players.firstWhere((p) => p.name == dareState.player).vetoTokens})',
+                    variant: ArbitroButtonVariant.ghost,
+                    onPressed: ss.session!.players.firstWhere((p) => p.name == dareState.player).vetoTokens > 0
+                        ? () {
+                            SoundService.instance.play(GameSound.votePass);
+                            HapticService.instance.medium();
+                            ss.useVeto(dareState.player);
+                          }
+                        : null,
                   ),
                 ),
               ],
@@ -151,7 +185,25 @@ class _SlotsScreenState extends State<SlotsScreen> {
   Widget build(BuildContext context) {
     final ss = SessionState.of(context);
     final session = ss.session;
-    if (session == null) return const Scaffold(body: Center(child: Text('No session')));
+
+    if (session == null || session.players.isEmpty) {
+      return Scaffold(
+        backgroundColor: AppColors.bgPrimary,
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.group_off_rounded, size: 80, color: AppColors.textLight),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Inicia uma sessão primeiro',
+                style: AppTextStyles.body.copyWith(color: AppColors.textLight),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     final dareState = session.currentDareState;
 
@@ -164,6 +216,40 @@ class _SlotsScreenState extends State<SlotsScreen> {
             children: [
               const Text('Social Slots', style: AppTextStyles.display),
               const SizedBox(height: AppSpacing.xxl),
+              // Turn announcement overlay
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (child, animation) {
+                  return ScaleTransition(
+                    scale: animation,
+                    child: child,
+                  );
+                },
+                child: _announcedPlayer == null
+                    ? const SizedBox.shrink()
+                    : AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: GlassCard(
+                          variant: GlassCardVariant.highlighted,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'É A VEZ DE',
+                                style: AppTextStyles.label.copyWith(
+                                    color: AppColors.textContrast),
+                              ),
+                              Text(
+                                '$_announcedPlayer!',
+                                style: AppTextStyles.display.copyWith(
+                                    fontSize: 42, color: AppColors.gold),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+              ),
               if (dareState == null) ...[
                 SlotMachine(
                   key: _machineKey,
@@ -173,11 +259,7 @@ class _SlotsScreenState extends State<SlotsScreen> {
                 const SizedBox(height: AppSpacing.xxl),
                 ArbitroButton(
                   label: 'GIRAR',
-                  onPressed: () {
-                    SoundService.instance.play(GameSound.spin);
-                    HapticService.instance.medium();
-                    _machineKey.currentState?.spin();
-                  },
+                  onPressed: _doSpin,
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 const Text('JOGADORES', style: AppTextStyles.label),
