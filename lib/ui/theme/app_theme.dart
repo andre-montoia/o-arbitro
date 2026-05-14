@@ -12,6 +12,7 @@ abstract final class AppTheme {
     colorScheme: const ColorScheme.dark(
       primary: AppColors.purple,
       secondary: AppColors.pink,
+      tertiary: AppColors.gold,
       surface: AppColors.surface,
       onPrimary: AppColors.textPrimary,
       onSurface: AppColors.textPrimary,

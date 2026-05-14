@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/player.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_spacing.dart';
 import '../theme/app_text_styles.dart';
 
 class ScoreHud extends StatefulWidget {
@@ -19,6 +20,7 @@ class ScoreHud extends StatefulWidget {
 
 class _ScoreHudState extends State<ScoreHud> with TickerProviderStateMixin {
   final Map<String, AnimationController> _flashes = {};
+  final Map<String, int> _prevScores = {};
 
   @override
   void initState() {
@@ -31,8 +33,9 @@ class _ScoreHudState extends State<ScoreHud> with TickerProviderStateMixin {
       if (!_flashes.containsKey(player.name)) {
         _flashes[player.name] = AnimationController(
           vsync: this,
-          duration: const Duration(milliseconds: 600),
+          duration: const Duration(milliseconds: 800),
         );
+        _prevScores[player.name] = player.score;
       }
     }
   }
@@ -40,20 +43,14 @@ class _ScoreHudState extends State<ScoreHud> with TickerProviderStateMixin {
   @override
   void didUpdateWidget(ScoreHud oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
-    // Ensure we have controllers for all current players
     _initControllers();
 
-    // Detect score increases
     for (final player in widget.players) {
-      final oldPlayer = oldWidget.players.cast<Player?>().firstWhere(
-            (p) => p?.name == player.name,
-            orElse: () => null,
-          );
-
-      if (oldPlayer != null && player.score > oldPlayer.score) {
+      final prevScore = _prevScores[player.name] ?? 0;
+      if (player.score > prevScore) {
         _flashes[player.name]?.forward(from: 0.0);
       }
+      _prevScores[player.name] = player.score;
     }
   }
 
@@ -67,86 +64,124 @@ class _ScoreHudState extends State<ScoreHud> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final hudHeight = AppSpacing.scoreHudHeight(context);
+    final fontScale = AppSpacing.fontScale(context);
+
     return Container(
-      height: 56,
-      decoration: const BoxDecoration(
-        color: AppColors.bgPrimary,
-        border: Border(
+      height: hudHeight,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.bgSecondary,
+            AppColors.bgPrimary,
+          ],
+        ),
+        border: const Border(
           bottom: BorderSide(color: AppColors.border, width: 1),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: widget.players.length,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.screenPadding(context) * 0.5,
+        ),
         itemBuilder: (context, index) {
           final player = widget.players[index];
           final isActive = player.name == widget.activePlayer;
           final controller = _flashes[player.name];
 
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
             child: AnimatedBuilder(
               animation: controller ?? kAlwaysDismissedAnimation,
               builder: (context, child) {
                 final flashValue = controller?.value ?? 0.0;
-                final backgroundColor = flashValue > 0
+                final bgColor = flashValue > 0
                     ? Color.lerp(
-                        Colors.amber.withValues(alpha: 0.4),
+                        AppColors.gold.withValues(alpha: 0.35),
                         Colors.transparent,
                         flashValue,
                       )
-                    : Colors.transparent;
+                    : (isActive
+                        ? AppColors.gold.withValues(alpha: 0.12)
+                        : Colors.transparent);
 
-                return Container(
-                  width: 100,
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: 100 * fontScale,
                   decoration: BoxDecoration(
-                    color: backgroundColor,
-                    borderRadius: BorderRadius.circular(8),
+                    color: bgColor,
+                    borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: isActive ? AppColors.gold : AppColors.border,
-                      width: isActive ? 1.5 : 1,
+                      width: isActive ? 2 : 1,
                     ),
+                    boxShadow: isActive
+                        ? [
+                            BoxShadow(
+                              color: AppColors.gold.withValues(alpha: 0.2),
+                              blurRadius: 8,
+                              spreadRadius: -2,
+                            ),
+                          ]
+                        : null,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Row(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              player.name.length > 8
-                                  ? '${player.name.substring(0, 8)}...'
-                                  : player.name,
-                              style: AppTextStyles.caption.copyWith(
-                                color: isActive ? AppColors.textPrimary : AppColors.textMuted,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  '${player.score}',
-                                  style: AppTextStyles.bodyStrong,
-                                ),
-                                if (player.isOnFire)
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 4),
-                                    child: Text('🔥', style: TextStyle(fontSize: 12)),
-                                  ),
-                              ],
-                            ),
-                          ],
+                      // Player name
+                      Text(
+                        player.name.length > 10
+                            ? '${player.name.substring(0, 10)}…'
+                            : player.name,
+                        style: AppTextStyles.caption.copyWith(
+                          color: isActive ? AppColors.textPrimary : AppColors.textMuted,
+                          fontWeight: isActive ? FontWeight.w700 : FontWeight.w400,
+                          fontSize: 10 * fontScale,
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
-                      Column(
+                      const SizedBox(height: 2),
+                      // Score with fire indicator
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _VetoDot(isFilled: player.vetoTokens >= 1),
-                          const SizedBox(height: 4),
-                          _VetoDot(isFilled: player.vetoTokens >= 2),
+                          Text(
+                            '${player.score}',
+                            style: AppTextStyles.bodyStrong.copyWith(
+                              fontSize: 14 * fontScale,
+                              color: isActive ? AppColors.gold : AppColors.textPrimary,
+                            ),
+                          ),
+                          if (player.isOnFire) ...[
+                            const SizedBox(width: 2),
+                            Text(
+                              '🔥',
+                              style: TextStyle(fontSize: 12 * fontScale),
+                            ),
+                          ],
+                        ],
+                      ),
+                      // Veto tokens
+                      const SizedBox(height: 2),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _VetoDot(isFilled: player.vetoTokens >= 1, size: 7 * fontScale),
+                          SizedBox(width: 3 * fontScale),
+                          _VetoDot(isFilled: player.vetoTokens >= 2, size: 7 * fontScale),
                         ],
                       ),
                     ],
@@ -162,22 +197,30 @@ class _ScoreHudState extends State<ScoreHud> with TickerProviderStateMixin {
 }
 
 class _VetoDot extends StatelessWidget {
-  const _VetoDot({required this.isFilled});
-
+  const _VetoDot({required this.isFilled, this.size = 8});
   final bool isFilled;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 8,
-      height: 8,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isFilled ? AppColors.purple : Colors.transparent,
+        color: isFilled ? AppColors.purpleLight : Colors.transparent,
         border: Border.all(
-          color: AppColors.purple,
+          color: isFilled ? AppColors.purpleLight : AppColors.textDisabled,
           width: 1,
         ),
+        boxShadow: isFilled
+            ? [
+                BoxShadow(
+                  color: AppColors.purpleLight.withValues(alpha: 0.4),
+                  blurRadius: 4,
+                ),
+              ]
+            : null,
       ),
     );
   }

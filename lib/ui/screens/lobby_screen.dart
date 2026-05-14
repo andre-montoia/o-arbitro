@@ -44,8 +44,7 @@ class LobbyScreen extends StatelessWidget {
             TextButton(
               onPressed: () => Navigator.pop(ctx),
               child: Text('CANCELAR',
-                  style:
-                      AppTextStyles.button.copyWith(color: AppColors.textMuted)),
+                  style: AppTextStyles.button.copyWith(color: AppColors.textMuted)),
             ),
             TextButton(
               onPressed: () {
@@ -54,8 +53,7 @@ class LobbyScreen extends StatelessWidget {
                 _showSetup(context);
               },
               child: Text('CONFIRMAR',
-                  style:
-                      AppTextStyles.button.copyWith(color: AppColors.danger)),
+                  style: AppTextStyles.button.copyWith(color: AppColors.danger)),
             ),
           ],
         ),
@@ -67,27 +65,32 @@ class LobbyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = SessionState.of(context);
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _AppBar(),
-              const SizedBox(height: AppSpacing.xl),
-              if (!state.hasSession) ...[
-                _NoSessionBanner(onStart: () => _showSetup(context)),
-              ] else ...[
-                _SessionBanner(
-                  players: state.session!.players.map((p) => p.name).toList(),
-                  onReset: () => _confirmReset(context),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                _FeaturedCard(),
-                const SizedBox(height: AppSpacing.md),
-                _SecondaryGrid(),
-              ],
-            ],
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.gradientDark),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(AppSpacing.screenPadding(context)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _AppBar(),
+                  SizedBox(height: AppSpacing.xl * AppSpacing.fontScale(context)),
+                  if (!state.hasSession) ...[
+                    _NoSessionBanner(onStart: () => _showSetup(context)),
+                  ] else ...[
+                    _SessionBanner(
+                      players: state.session!.players.map((p) => p.name).toList(),
+                      onReset: () => _confirmReset(context),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    const _FeaturedCard(),
+                    const SizedBox(height: AppSpacing.md),
+                    const _SecondaryGrid(),
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -96,6 +99,8 @@ class LobbyScreen extends StatelessWidget {
 }
 
 class _AppBar extends StatelessWidget {
+  const _AppBar();
+
   @override
   Widget build(BuildContext context) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -113,11 +118,19 @@ class _AppBar extends StatelessWidget {
         ),
       ),
       Container(
-        width: 36, height: 36,
-        decoration: const BoxDecoration(
+        width: 40, height: 40,
+        decoration: BoxDecoration(
           gradient: AppColors.gradientPrimary,
           shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadowPurple,
+              blurRadius: 12,
+              spreadRadius: -2,
+            ),
+          ],
         ),
+        child: const Icon(Icons.sports_martial_arts, color: Colors.white, size: 20),
       ),
     ],
   );
@@ -130,17 +143,18 @@ class _NoSessionBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) => GlassCard(
     variant: GlassCardVariant.highlighted,
-    padding: const EdgeInsets.all(AppSpacing.xl),
+    padding: EdgeInsets.all(AppSpacing.lg * AppSpacing.fontScale(context)),
     child: Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         const Text('🎮', style: TextStyle(fontSize: 48)),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.sm),
         const Text('Prontos para jogar?', style: AppTextStyles.heading,
           textAlign: TextAlign.center),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacing.xs),
         const Text('Adiciona os jogadores para começar',
           style: AppTextStyles.body, textAlign: TextAlign.center),
-        const SizedBox(height: AppSpacing.lg),
+        SizedBox(height: AppSpacing.lg * AppSpacing.fontScale(context)),
         ArbitroButton(label: 'INICIAR SESSÃO', onPressed: onStart, fullWidth: true),
       ],
     ),
@@ -176,6 +190,8 @@ class _SessionBanner extends StatelessWidget {
 }
 
 class _FeaturedCard extends StatelessWidget {
+  const _FeaturedCard();
+
   @override
   Widget build(BuildContext context) => const GlassCard(
     variant: GlassCardVariant.highlighted,
@@ -202,6 +218,8 @@ class _FeaturedCard extends StatelessWidget {
 }
 
 class _SecondaryGrid extends StatelessWidget {
+  const _SecondaryGrid();
+
   @override
   Widget build(BuildContext context) => const Row(
     children: [

@@ -8,6 +8,7 @@ import '../ui/screens/slots_screen.dart';
 import '../ui/screens/roulette_screen.dart';
 import '../ui/screens/ledger_screen.dart';
 import '../ui/theme/app_colors.dart';
+import '../ui/theme/app_text_styles.dart';
 
 class AppRouter extends StatefulWidget {
   const AppRouter({super.key});
@@ -53,12 +54,36 @@ class _AppRouterState extends State<AppRouter> {
           ],
         ),
         bottomNavigationBar: Container(
-          decoration: const BoxDecoration(
-            border: Border(top: BorderSide(color: AppColors.border, width: 1)),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF1A1A30), Color(0xFF0C0C18)],
+            ),
+            border: const Border(top: BorderSide(color: AppColors.border, width: 1)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowDark,
+                blurRadius: 12,
+                offset: const Offset(0, -2),
+              ),
+            ],
           ),
           child: BottomNavigationBar(
             currentIndex: _index,
             onTap: (i) => setState(() => _index = i),
+            backgroundColor: Colors.transparent,
+            selectedItemColor: AppColors.purpleLight,
+            unselectedItemColor: AppColors.textDisabled,
+            type: BottomNavigationBarType.fixed,
+            elevation: 0,
+            selectedLabelStyle: AppTextStyles.caption.copyWith(
+              color: AppColors.purpleLight,
+              fontWeight: FontWeight.w700,
+            ),
+            unselectedLabelStyle: AppTextStyles.caption.copyWith(
+              color: AppColors.textDisabled,
+            ),
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Lobby'),
               BottomNavigationBarItem(icon: Icon(Icons.casino_rounded), label: 'Slots'),

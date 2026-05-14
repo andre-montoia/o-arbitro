@@ -90,57 +90,60 @@ class _RouletteScreenState extends State<RouletteScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.bgPrimary,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.screenPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text('Roleta do Destino', style: AppTextStyles.display, textAlign: TextAlign.center),
-                  const SizedBox(height: AppSpacing.xxl),
-                  ArbitroInput(controller: _questionController, hint: 'Qual a questão a decidir?'),
-                  const SizedBox(height: AppSpacing.xxl),
-                  if (_lastWinner != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Text(
-                        'Última volta: $_lastWinner',
-                        style: AppTextStyles.body.copyWith(color: AppColors.gold),
-                        textAlign: TextAlign.center,
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.gradientDark),
+        child: Stack(
+          children: [
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(AppSpacing.screenPadding(context)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text('Roleta do Destino', style: AppTextStyles.display, textAlign: TextAlign.center),
+                    SizedBox(height: AppSpacing.xxl * AppSpacing.fontScale(context)),
+                    ArbitroInput(controller: _questionController, hint: 'Qual a questão a decidir?'),
+                    SizedBox(height: AppSpacing.xxl * AppSpacing.fontScale(context)),
+                    if (_lastWinner != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(
+                          'Última volta: $_lastWinner',
+                          style: AppTextStyles.body.copyWith(color: AppColors.gold),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    Center(
+                      child: RouletteWheel(
+                        key: _wheelKey,
+                        players: players,
+                        onResult: _onResult,
+                        onSpinComplete: _onSpinComplete,
                       ),
                     ),
-                  Center(
-                    child: RouletteWheel(
-                      key: _wheelKey,
-                      players: players,
-                      onResult: _onResult,
-                      onSpinComplete: _onSpinComplete,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xxl),
-                  if (_winner == null)
-                    ArbitroButton(
-                      label: 'GIRAR',
-                      onPressed: () => _wheelKey.currentState?.spin(),
-                      fullWidth: true,
-                    )
-                  else ...[
-                    ArbitroButton(
-                      label: 'NOVA QUESTÃO',
-                      variant: ArbitroButtonVariant.secondary,
-                      onPressed: _reset,
-                      fullWidth: true,
-                    ),
+                    SizedBox(height: AppSpacing.xxl * AppSpacing.fontScale(context)),
+                    if (_winner == null)
+                      ArbitroButton(
+                        label: 'GIRAR',
+                        onPressed: () => _wheelKey.currentState?.spin(),
+                        fullWidth: true,
+                      )
+                    else ...[
+                      ArbitroButton(
+                        label: 'NOVA QUESTÃO',
+                        variant: ArbitroButtonVariant.secondary,
+                        onPressed: _reset,
+                        fullWidth: true,
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
-          ),
-          if (_showOverlay && _winner != null)
-            _WinnerOverlay(winner: _winner!, onDismiss: _dismissOverlay),
-        ],
+            if (_showOverlay && _winner != null)
+              _WinnerOverlay(winner: _winner!, onDismiss: _dismissOverlay),
+          ],
+        ),
       ),
     );
   }

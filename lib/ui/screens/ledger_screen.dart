@@ -72,11 +72,13 @@ class _LedgerScreenState extends State<LedgerScreen> {
     final filtered = _filtered(entries);
 
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.screenPadding),
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.gradientDark),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(AppSpacing.screenPadding(context)),
               child: Column(
                 children: [
                   const Text('Absurdity Ledger', style: AppTextStyles.heading),
@@ -125,8 +127,8 @@ class _LedgerScreenState extends State<LedgerScreen> {
                       child: Text('Sem entradas ainda', style: AppTextStyles.body))
                   : AnimatedList(
                       key: _listKey,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.screenPadding),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.screenPadding(context)),
                       initialItemCount: filtered.length,
                       itemBuilder: (ctx, i, animation) {
                         if (i >= filtered.length) return const SizedBox.shrink();
@@ -143,7 +145,7 @@ class _LedgerScreenState extends State<LedgerScreen> {
                     ),
             ),
             Padding(
-              padding: const EdgeInsets.all(AppSpacing.screenPadding),
+              padding: EdgeInsets.all(AppSpacing.screenPadding(context)),
               child: ArbitroButton(
                 label: '+ NOVA ENTRADA',
                 onPressed: () => _showNewEntry(context),
@@ -153,6 +155,7 @@ class _LedgerScreenState extends State<LedgerScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

@@ -194,11 +194,11 @@ class _SlotsScreenState extends State<SlotsScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.group_off_rounded, size: 80, color: AppColors.textLight),
+              const Icon(Icons.group_off_rounded, size: 80, color: AppColors.textDisabled),
               const SizedBox(height: AppSpacing.md),
               Text(
                 'Inicia uma sessão primeiro',
-                style: AppTextStyles.body.copyWith(color: AppColors.textLight),
+                style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
               ),
             ],
           ),
@@ -209,10 +209,12 @@ class _SlotsScreenState extends State<SlotsScreen> {
     final dareState = session.currentDareState;
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          child: Column(
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.gradientDark),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(AppSpacing.screenPadding(context)),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Text('Social Slots', style: AppTextStyles.display),
@@ -283,6 +285,7 @@ class _SlotsScreenState extends State<SlotsScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }
