@@ -41,7 +41,6 @@ abstract final class Dares {
         'Publica uma foto da infância envergonhada no Instagram',
         'Envia uma declaração de amor exagerada a um amigo — a sério',
       ],
-      ],
     },
     DareCategory.fisico: {
       DareIntensity.casual: [
@@ -64,7 +63,6 @@ abstract final class Dares {
         'Anda às cavalitas do jogador mais pesado do grupo',
         'Salta à corda imaginária durante 2 minutos sem parar',
         'Faz 10 burpees perfeitos',
-      ],
       ],
     },
     DareCategory.mental: {
@@ -89,7 +87,6 @@ abstract final class Dares {
         'Se pudesses apagar um evento da tua vida, qual era? Porquê?',
         'Confessa algo ao grupo que nunca tiveste coragem de dizer',
       ],
-      ],
     },
     DareCategory.wild: {
       DareIntensity.casual: [
@@ -113,12 +110,11 @@ abstract final class Dares {
         'O grupo escreve uma mensagem e tu envias para quem eles escolherem',
         'Ficas às ordens do grupo durante as próximas 5 rondas',
       ],
-      DareIntensity.castigo: [
-        'O grupo decide 3 desafios seguidos — sem veto possível',
-        'Deixa o grupo aceder ao teu telemóvel durante 2 minutos',
-        'Faz tudo o que o grupo mandar durante os próximos 10 minutos',
-        'O grupo escolhe alguém para te dar um castigo — aceitas sem discutir',
-        'Ficas mudo durante 5 rondas — só podes comunicar por gestos',
+    },
+  };
+
+  static const List<String> _punishment = [
+    'Faz 15 flexões agora mesmo sem parar',
     'Imita o membro do grupo que o grupo escolher durante 2 minutos',
     'Deixa o grupo escrever uma mensagem no teu telemóvel e enviar a quem quiserem',
     'Mantém-te em posição de cadeira durante 90 segundos',
