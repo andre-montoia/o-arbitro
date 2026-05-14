@@ -18,15 +18,14 @@ Widget _wrap(Session session) => MaterialApp(
 
 void main() {
   testWidgets('ledger shows empty state when no entries', (tester) async {
-    final session =
-        Session(players: [Player(name: 'Ana'), Player(name: 'Bruno')]);
+    final session = Session(players: [const Player(name: 'Ana'), const Player(name: 'Bruno')]);
     await tester.pumpWidget(_wrap(session));
     expect(find.text('Sem entradas ainda'), findsOneWidget);
   });
 
   testWidgets('ledger shows score entry', (tester) async {
     final session = Session(
-      players: [Player(name: 'Ana'), Player(name: 'Bruno')],
+      players: [const Player(name: 'Ana'), const Player(name: 'Bruno')],
       ledgerEntries: [
         ScoreEntry(
           player: 'Ana',

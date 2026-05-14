@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/session.dart';
 import '../models/session_state.dart';
+import '../services/session_persistence.dart';
 import '../ui/components/score_hud.dart';
 import '../ui/screens/lobby_screen.dart';
 import '../ui/screens/slots_screen.dart';
@@ -19,7 +20,21 @@ class _AppRouterState extends State<AppRouter> {
   int _index = 0;
   Session? _session;
 
-  void _onSessionChanged(Session? s) => setState(() => _session = s);
+  @override
+  void initState() {
+    super.initState();
+    _loadSession();
+  }
+
+  Future<void> _loadSession() async {
+    final s = await SessionPersistence.load();
+    if (s != null && mounted) setState(() => _session = s);
+  }
+
+  void _onSessionChanged(Session? s) {
+    setState(() => _session = s);
+    SessionPersistence.save(s);
+  }
 
   @override
   Widget build(BuildContext context) {

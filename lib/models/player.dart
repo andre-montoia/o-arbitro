@@ -21,8 +21,21 @@ class Player {
   bool get canVeto => vetoTokens > 0;
   bool get isOnFire => streak >= 3;
 
-  factory Player.fromJson(Map<String, dynamic> json) => _$PlayerFromJson(json);
-  Map<String, dynamic> toJson() => _$PlayerToJson(this);
+  factory Player.fromJson(Map<String, dynamic> json) => Player(
+        name: json['name'] as String,
+        vetoTokens: (json['vetoTokens'] as num?)?.toInt() ?? 2,
+        daresCompleted: (json['daresCompleted'] as num?)?.toInt() ?? 0,
+        score: (json['score'] as num?)?.toInt() ?? 0,
+        streak: (json['streak'] as num?)?.toInt() ?? 0,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'vetoTokens': vetoTokens,
+        'daresCompleted': daresCompleted,
+        'score': score,
+        'streak': streak,
+      };
 
   Player useVeto() => _copyWith(vetoTokens: vetoTokens - 1, streak: 0);
   Player earnVeto() => _copyWith(vetoTokens: vetoTokens + 1);

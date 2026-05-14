@@ -4,13 +4,19 @@ import '../models/spin_result.dart';
 abstract final class Dares {
   static final _random = Random();
 
-  static List<String> get(DareCategory category, DareIntensity intensity) =>
-    _content[category]![intensity]!;
+  static List<String> get(DareCategory category, DareIntensity intensity) {
+    if (intensity == DareIntensity.castigo) return _punishment;
+    return _content[category]![intensity]!;
+  }
 
   static String random(DareCategory category, DareIntensity intensity) {
     final bucket = get(category, intensity);
+    if (bucket.isEmpty) return 'Improvisa um desafio!';
     return bucket[_random.nextInt(bucket.length)];
   }
+
+  static String randomPunishment() =>
+      _punishment[_random.nextInt(_punishment.length)];
 
   static const Map<DareCategory, Map<DareIntensity, List<String>>> _content = {
     DareCategory.social: {
@@ -32,8 +38,9 @@ abstract final class Dares {
         'Conta o teu maior segredo ao grupo',
         'Mostra as últimas 10 pesquisas no Google',
         'Liga para alguém aleatório dos teus contactos e canta os parabéns',
-        'Publica uma foto da infância envergonhosa no Instagram',
+        'Publica uma foto da infância envergonhada no Instagram',
         'Envia uma declaração de amor exagerada a um amigo — a sério',
+      ],
       ],
     },
     DareCategory.fisico: {
@@ -58,6 +65,7 @@ abstract final class Dares {
         'Salta à corda imaginária durante 2 minutos sem parar',
         'Faz 10 burpees perfeitos',
       ],
+      ],
     },
     DareCategory.mental: {
       DareIntensity.casual: [
@@ -80,6 +88,7 @@ abstract final class Dares {
         'Qual foi o teu pior momento de vida? Partilha com o grupo',
         'Se pudesses apagar um evento da tua vida, qual era? Porquê?',
         'Confessa algo ao grupo que nunca tiveste coragem de dizer',
+      ],
       ],
     },
     DareCategory.wild: {
@@ -104,14 +113,12 @@ abstract final class Dares {
         'O grupo escreve uma mensagem e tu envias para quem eles escolherem',
         'Ficas às ordens do grupo durante as próximas 5 rondas',
       ],
-    },
-  };
-
-  static String randomPunishment() =>
-      _punishment[_random.nextInt(_punishment.length)];
-
-  static const List<String> _punishment = [
-    'Faz 15 flexões agora mesmo sem parar',
+      DareIntensity.castigo: [
+        'O grupo decide 3 desafios seguidos — sem veto possível',
+        'Deixa o grupo aceder ao teu telemóvel durante 2 minutos',
+        'Faz tudo o que o grupo mandar durante os próximos 10 minutos',
+        'O grupo escolhe alguém para te dar um castigo — aceitas sem discutir',
+        'Ficas mudo durante 5 rondas — só podes comunicar por gestos',
     'Imita o membro do grupo que o grupo escolher durante 2 minutos',
     'Deixa o grupo escrever uma mensagem no teu telemóvel e enviar a quem quiserem',
     'Mantém-te em posição de cadeira durante 90 segundos',

@@ -1,13 +1,9 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'player.dart';
 import 'spin_result.dart';
 import 'roulette_result.dart';
 import 'ledger_entry.dart';
 import 'dare_state.dart';
 
-part 'session.g.dart';
-
-@JsonSerializable(explicitToJson: true)
 class Session {
   Session({
     required List<Player> players,
@@ -17,10 +13,10 @@ class Session {
     this.currentDareState,
   })  : assert(players.length >= 2, 'Session requires at least 2 players'),
         assert(players.length <= 8, 'Session allows max 8 players'),
-        this.players = List.unmodifiable(players),
-        this.slotsHistory = List.unmodifiable(slotsHistory ?? []),
-        this.rouletteHistory = List.unmodifiable(rouletteHistory ?? []),
-        this.ledgerEntries = List.unmodifiable(ledgerEntries ?? []);
+        players = List.unmodifiable(players),
+        slotsHistory = List<SpinResult>.unmodifiable(slotsHistory ?? []),
+        rouletteHistory = List<RouletteResult>.unmodifiable(rouletteHistory ?? []),
+        ledgerEntries = List<LedgerEntry>.unmodifiable(ledgerEntries ?? []);
 
   final List<Player> players;
   final List<SpinResult> slotsHistory;
@@ -28,8 +24,51 @@ class Session {
   final List<LedgerEntry> ledgerEntries;
   final DareState? currentDareState;
 
-  factory Session.fromJson(Map<String, dynamic> json) => _$SessionFromJson(json);
-  Map<String, dynamic> toJson() => _$SessionToJson(this);
+  factory Session.fromJson(Map<String, dynamic> json) => Session(
+        players: (json['players'] as List<dynamic>)
+            .map((e) => Player.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        slotsHistory: (json['slotsHistory'] as List<dynamic>?)
+            ?.map((e) => SpinResult.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        rouletteHistory: (json['rouletteHistory'] as List<dynamic>?)
+            ?.map((e) => RouletteResult.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        ledgerEntries: (json['ledgerEntries'] as List<dynamic>?)
+            ?.map((e) => ledgerEntryFromJson(e as Map<String, dynamic>))
+            .toList(),
+        currentDareState: json['currentDareState'] == null
+            ? null
+            : DareState.fromJson(json['currentDareState'] as Map<String, dynamic>),
+      );
+
+  Map<String, dynamic> toJson() => {
+        'players': players.map((e) => e.toJson()).toList(),
+        'slotsHistory': slotsHistory.map((e) => e.toJson()).toList(),
+        'rouletteHistory': rouletteHistory.map((e) => e.toJson()).toList(),
+        'ledgerEntries': ledgerEntries.map((e) => _ledgerEntryToJson(e)).toList(),
+        'currentDareState': currentDareState?.toJson(),
+      };
+
+  static LedgerEntry ledgerEntryFromJson(Map<String, dynamic> json) {
+    final type = json['type'] as String?;
+    if (type == 'SocialBet') return SocialBet.fromJson(json);
+    if (type == 'Prediction') return Prediction.fromJson(json);
+    if (type == 'ScoreEntry') return ScoreEntry.fromJson(json);
+    throw ArgumentError('Unknown LedgerEntry type: $type');
+  }
+
+  static Map<String, dynamic> _ledgerEntryToJson(LedgerEntry entry) {
+    final map = entry.toJson();
+    if (entry is SocialBet) {
+      map['type'] = 'SocialBet';
+    } else if (entry is Prediction) {
+      map['type'] = 'Prediction';
+    } else if (entry is ScoreEntry) {
+      map['type'] = 'ScoreEntry';
+    }
+    return map;
+  }
 
   // ── dare lifecycle ──────────────────────────────────────────────
 
@@ -78,10 +117,24 @@ class Session {
     assert(currentDareState?.phase == DarePhase.voting);
     final ds = currentDareState!;
     final passed = ds.isPassed(players.map((p) => p.name).toList());
+
+    int pointsForIntensity(String intensity) => switch (intensity) {
+          'CASUAL' => 100,
+          'OUSADO' => 250,
+          'ÉPICO' => 500,
+          'CASTIGO' => 50,
+          _ => 100,
+        };
+
     final updated = players.map((p) {
       if (p.name != ds.player) return p;
-      return passed ? p.addScore(100) : p.resetStreak();
+      if (!passed) return p.resetStreak();
+      final points = pointsForIntensity(ds.intensity);
+      var result = p.addScore(points);
+      if (result.streak == 3) result = result.earnVeto();
+      return result;
     }).toList();
+
     return (_copyWith(players: updated, dareState: null), passed);
   }
 
@@ -113,8 +166,6 @@ class Session {
   }
 
   Session withDareState(DareState? state) => _copyWith(dareState: state);
-
-  // ── existing methods ────────────────────────────────────────────
 
   Session useVeto(String playerName) {
     final updated = players

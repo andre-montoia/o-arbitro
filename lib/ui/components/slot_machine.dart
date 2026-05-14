@@ -156,7 +156,7 @@ class SlotMachineState extends State<SlotMachine> with SingleTickerProviderState
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(height: 44, decoration: BoxDecoration(
-                                color: AppColors.purple.withOpacity(0.08),
+                                color: AppColors.purple.withValues(alpha: 0.08),
                               )),
                             ],
                           ),
@@ -171,7 +171,7 @@ class SlotMachineState extends State<SlotMachine> with SingleTickerProviderState
                                 duration: const Duration(milliseconds: 600),
                               ),
                             ),
-                            Container(width: 1, color: AppColors.purple.withOpacity(0.4)),
+                            Container(width: 1, color: AppColors.purple.withValues(alpha: 0.4)),
                             Expanded(
                               child: SlotReel(
                                 key: _reel2Key,
@@ -179,7 +179,7 @@ class SlotMachineState extends State<SlotMachine> with SingleTickerProviderState
                                 duration: const Duration(milliseconds: 750),
                               ),
                             ),
-                            Container(width: 1, color: AppColors.purple.withOpacity(0.4)),
+                            Container(width: 1, color: AppColors.purple.withValues(alpha: 0.4)),
                             Expanded(
                               child: SlotReel(
                                 key: _reel3Key,
@@ -209,7 +209,7 @@ class SlotMachineState extends State<SlotMachine> with SingleTickerProviderState
           const SizedBox(height: AppSpacing.md),
           // Decorative lever line
           Row(children: [
-            Expanded(child: Container(height: 1, color: AppColors.purple.withOpacity(0.3))),
+            Expanded(child: Container(height: 1, color: AppColors.purple.withValues(alpha: 0.3))),
             const SizedBox(width: 12),
             Container(
               width: 8, height: 8,
@@ -219,7 +219,7 @@ class SlotMachineState extends State<SlotMachine> with SingleTickerProviderState
               ),
             ),
             const SizedBox(width: 12),
-            Expanded(child: Container(height: 1, color: AppColors.purple.withOpacity(0.3))),
+            Expanded(child: Container(height: 1, color: AppColors.purple.withValues(alpha: 0.3))),
           ]),
         ],
       ),
@@ -231,7 +231,7 @@ class _ScanlinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppColors.purpleLight.withOpacity(0.04)
+      ..color = AppColors.purpleLight.withValues(alpha: 0.04)
       ..strokeWidth = 1;
     for (double y = 0; y < size.height; y += 4) {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
@@ -276,7 +276,7 @@ class _ChromeFramePainter extends CustomPainter {
     ];
     for (int i = 0; i < positions.length; i++) {
       final colorIdx = ((lightValue * _lightColors.length).floor() + i) % _lightColors.length;
-      lightPaint.color = _lightColors[colorIdx].withOpacity(0.8);
+      lightPaint.color = _lightColors[colorIdx].withValues(alpha: 0.8);
       canvas.drawCircle(positions[i], 5, lightPaint);
     }
   }

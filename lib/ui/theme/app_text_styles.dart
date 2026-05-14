@@ -58,4 +58,20 @@ abstract final class AppTextStyles {
     color: AppColors.textPrimary,
     letterSpacing: 0.5,
   );
+
+  static const TextStyle h1 = TextStyle(
+    fontFamily: 'Syne',
+    fontWeight: FontWeight.w800,
+    fontSize: 32,
+    color: AppColors.textPrimary,
+    height: 1.1,
+  );
+
+  static const TextStyle h2 = TextStyle(
+    fontFamily: 'Syne',
+    fontWeight: FontWeight.w700,
+    fontSize: 24,
+    color: AppColors.textPrimary,
+    height: 1.2,
+  );
 }

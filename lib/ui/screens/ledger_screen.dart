@@ -382,7 +382,7 @@ class _BetCardState extends State<_BetCard> with SingleTickerProviderStateMixin 
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius + 1),
           border: Border.all(
-            color: AppColors.gold.withOpacity(_pulseAnim.value * 0.6),
+            color: AppColors.gold.withValues(alpha: _pulseAnim.value * 0.6),
             width: 1.5,
           ),
         ),

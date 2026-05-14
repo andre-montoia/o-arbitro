@@ -20,6 +20,9 @@ abstract final class AppColors {
   static const Color textPrimary  = Color(0xFFFFFFFF);
   static const Color textMuted    = Color(0xFFA0A0C0);
   static const Color textDisabled = Color(0xFF555577);
+  static const Color textContrast = Color(0xFFFFFFFF);
+  static const Color textSecondary = Color(0xFFC0C0D0);
+  static const Color textLight    = Color(0xFFE0E0F0);
 
   static const LinearGradient gradientPrimary = LinearGradient(
     begin: Alignment.topLeft,

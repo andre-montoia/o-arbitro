@@ -118,7 +118,7 @@ class _NewLedgerEntrySheetState extends State<NewLedgerEntrySheet> {
           if (_type == _EntryType.pontuacao) ...[
             const SizedBox(height: AppSpacing.sm),
             DropdownButtonFormField<String>(
-              value: _selectedPlayer ?? players.first,
+              initialValue: _selectedPlayer ?? players.first,
               dropdownColor: AppColors.surface2,
               style: AppTextStyles.bodyStrong,
               decoration: InputDecoration(

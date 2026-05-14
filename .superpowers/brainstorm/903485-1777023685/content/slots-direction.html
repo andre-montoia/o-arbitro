@@ -1,0 +1,113 @@
+<h2>Social Slots — Which direction?</h2>
+<p class="subtitle">Current implementation vs. two upgrade directions. Pick the one that feels right for a party game.</p>
+
+<div class="cards">
+
+  <!-- Current -->
+  <div class="card" data-choice="current" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#13132A;border-radius:12px;padding:20px;display:flex;gap:10px;justify-content:center;align-items:center">
+        <div style="width:90px;height:80px;background:#1E1E3A;border:1px solid rgba(168,85,247,0.2);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-size:9px;color:#A855F7;letter-spacing:1.5px;font-weight:700;margin-bottom:4px">JOGADOR</div>
+          <div style="color:#fff;font-size:13px;font-weight:700">Ana</div>
+        </div>
+        <div style="width:90px;height:80px;background:#1E1E3A;border:1px solid rgba(168,85,247,0.2);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-size:9px;color:#A855F7;letter-spacing:1.5px;font-weight:700;margin-bottom:4px">CATEGORIA</div>
+          <div style="color:#fff;font-size:13px;font-weight:700">Social</div>
+        </div>
+        <div style="width:90px;height:80px;background:#1E1E3A;border:1px solid rgba(168,85,247,0.2);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-size:9px;color:#A855F7;letter-spacing:1.5px;font-weight:700;margin-bottom:4px">NÍVEL</div>
+          <div style="color:#A855F7;font-size:13px;font-weight:700">ÉPICO</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Current (static boxes)</h3>
+      <p>3 labelled boxes that swap text. Simple, readable but no sense of a real slot machine.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Real slot reels -->
+  <div class="card" data-choice="reels" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#0D0D1A;border-radius:12px;padding:20px;position:relative">
+        <!-- Machine frame -->
+        <div style="background:linear-gradient(135deg,#2a1a4e,#1a0a3e);border:3px solid #7C3AED;border-radius:16px;padding:16px;box-shadow:0 0 30px rgba(124,58,237,0.4)">
+          <!-- Reel window -->
+          <div style="background:#0D0D1A;border-radius:8px;padding:8px;border:2px solid #A855F7;display:flex;gap:6px;margin-bottom:12px;position:relative;overflow:hidden">
+            <!-- Scanline effect -->
+            <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(168,85,247,0.03) 3px,rgba(168,85,247,0.03) 4px);pointer-events:none;z-index:2"></div>
+            <!-- highlight line in middle -->
+            <div style="position:absolute;top:50%;left:0;right:0;height:2px;background:rgba(168,85,247,0.3);transform:translateY(-50%);z-index:3"></div>
+            <!-- Reel 1 -->
+            <div style="flex:1;height:90px;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="color:#6b7280;font-size:10px;opacity:0.5">Bruno</div>
+              <div style="color:#ffffff;font-size:14px;font-weight:700;padding:4px 0;border-top:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1);width:100%;text-align:center">Ana</div>
+              <div style="color:#6b7280;font-size:10px;opacity:0.5">Carlos</div>
+            </div>
+            <!-- Divider -->
+            <div style="width:1px;background:rgba(168,85,247,0.3)"></div>
+            <!-- Reel 2 -->
+            <div style="flex:1;height:90px;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="color:#6b7280;font-size:10px;opacity:0.5">Mental</div>
+              <div style="color:#ffffff;font-size:14px;font-weight:700;padding:4px 0;border-top:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1);width:100%;text-align:center">Social</div>
+              <div style="color:#6b7280;font-size:10px;opacity:0.5">Wild</div>
+            </div>
+            <!-- Divider -->
+            <div style="width:1px;background:rgba(168,85,247,0.3)"></div>
+            <!-- Reel 3 -->
+            <div style="flex:1;height:90px;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="color:#6b7280;font-size:10px;opacity:0.5">CASUAL</div>
+              <div style="color:#A855F7;font-size:14px;font-weight:700;padding:4px 0;border-top:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1);width:100%;text-align:center">ÉPICO</div>
+              <div style="color:#6b7280;font-size:10px;opacity:0.5">OUSADO</div>
+            </div>
+          </div>
+          <!-- Lever handle area -->
+          <div style="display:flex;align-items:center;justify-content:center;gap:12px">
+            <div style="flex:1;height:2px;background:rgba(168,85,247,0.3)"></div>
+            <div style="background:linear-gradient(135deg,#7C3AED,#EC4899);border-radius:100px;padding:8px 24px;font-size:11px;font-weight:700;color:#fff;letter-spacing:1px">GIRAR</div>
+            <div style="flex:1;height:2px;background:rgba(168,85,247,0.3)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Real slot reels (recommended)</h3>
+      <p>Vertical scrolling reels with items above/below visible. Purple neon machine frame. Feels like a real slot machine. Big upgrade in feel.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Card flip -->
+  <div class="card" data-choice="flip" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#0D0D1A;border-radius:12px;padding:20px">
+        <div style="display:flex;gap:10px;justify-content:center">
+          <!-- Card 1 - face up -->
+          <div style="width:85px;height:110px;background:linear-gradient(135deg,#7C3AED,#A855F7);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(124,58,237,0.4)">
+            <div style="font-size:24px">👤</div>
+            <div style="color:#fff;font-size:11px;font-weight:700;margin-top:6px">Ana</div>
+            <div style="color:rgba(255,255,255,0.6);font-size:9px;letter-spacing:1px;margin-top:2px">JOGADOR</div>
+          </div>
+          <!-- Card 2 - face down / flipping -->
+          <div style="width:85px;height:110px;background:linear-gradient(135deg,#1E1E3A,#2a2a4a);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid rgba(168,85,247,0.3);box-shadow:0 8px 20px rgba(0,0,0,0.3)">
+            <div style="font-size:24px">❓</div>
+            <div style="color:rgba(255,255,255,0.3);font-size:9px;letter-spacing:1px;margin-top:6px">CATEGORIA</div>
+          </div>
+          <!-- Card 3 - face down -->
+          <div style="width:85px;height:110px;background:linear-gradient(135deg,#1E1E3A,#2a2a4a);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid rgba(168,85,247,0.3);box-shadow:0 8px 20px rgba(0,0,0,0.3)">
+            <div style="font-size:24px">❓</div>
+            <div style="color:rgba(255,255,255,0.3);font-size:9px;letter-spacing:1px;margin-top:6px">NÍVEL</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:12px">
+          <div style="display:inline-block;background:linear-gradient(135deg,#7C3AED,#EC4899);border-radius:100px;padding:6px 20px;font-size:11px;font-weight:700;color:#fff;letter-spacing:1px">REVELAR</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Card flip / reveal</h3>
+      <p>Cards flip one-by-one revealing player → category → intensity. More dramatic/theatrical. Less "slot machine", more "destiny card".</p>
+    </div>
+  </div>
+
+</div>

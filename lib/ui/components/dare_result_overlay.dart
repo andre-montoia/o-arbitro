@@ -5,7 +5,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text_styles.dart';
 
-class DareResultOverlay extends StatelessWidget {
+class DareResultOverlay extends StatefulWidget {
   const DareResultOverlay({
     super.key,
     required this.dareState,
@@ -14,26 +14,48 @@ class DareResultOverlay extends StatelessWidget {
   final DareState dareState;
 
   @override
+  State<DareResultOverlay> createState() => _DareResultOverlayState();
+}
+
+class _DareResultOverlayState extends State<DareResultOverlay>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _scale = CurvedAnimation(parent: _ctrl, curve: Curves.elasticOut);
+    _ctrl.forward();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isPassed = dareState.resolvedPassed ?? false;
+    final isPassed = widget.dareState.resolvedPassed ?? false;
     final primaryColor = isPassed ? AppColors.green : AppColors.danger;
     final secondaryColor = isPassed ? const Color(0xff123524) : const Color(0xff351212);
 
     final String outcomeText = isPassed ? 'APROVADO!' : 'REPROVADO!';
     final IconData outcomeIcon = isPassed ? Icons.check_circle_rounded : Icons.cancel_rounded;
 
-    // Calculate vote breakdown
     final sessionState = SessionState.of(context);
     final allPlayers = sessionState.session?.players.map((p) => p.name).toList() ?? [];
-    final voters = allPlayers.where((p) => p != dareState.player).toList();
-    final passCount = voters.where((p) => dareState.votes[p] == true).length;
-    final failCount = voters.where((p) => dareState.votes[p] == false).length;
+    final voters = allPlayers.where((p) => p != widget.dareState.player).toList();
+    final passCount = voters.where((p) => widget.dareState.votes[p] == true).length;
+    final failCount = voters.where((p) => widget.dareState.votes[p] == false).length;
 
     return ScaleTransition(
-      scale: Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(
-        parent: ModalRoute.of(context)!.animation!,
-        curve: Curves.elasticOut,
-      )),
+      scale: _scale,
       child: Center(
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -43,7 +65,7 @@ class DareResultOverlay extends StatelessWidget {
             border: Border.all(color: primaryColor, width: 3),
             boxShadow: [
               BoxShadow(
-                color: primaryColor.withOpacity(0.4),
+                color: primaryColor.withValues(alpha: 0.4),
                 blurRadius: 20,
                 spreadRadius: -5,
                 offset: const Offset(0, 10),
@@ -56,17 +78,17 @@ class DareResultOverlay extends StatelessWidget {
               Icon(outcomeIcon, color: primaryColor, size: 80),
               const SizedBox(height: AppSpacing.md),
               Text(
-                dareState.player,
-                style: AppTextStyles.h2.copyWith(color: AppColors.textPrimary),
+                widget.dareState.player,
+                style: AppTextStyles.heading.copyWith(color: AppColors.textPrimary),
               ),
               Text(
                 outcomeText,
-                style: AppTextStyles.h1.copyWith(color: primaryColor),
+                style: AppTextStyles.display.copyWith(color: primaryColor),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(
                 '$passCount ✅ $failCount ❌',
-                style: AppTextStyles.bodyStrong.copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.bodyStrong.copyWith(color: AppColors.textMuted),
               ),
               const SizedBox(height: AppSpacing.xl),
               ElevatedButton(

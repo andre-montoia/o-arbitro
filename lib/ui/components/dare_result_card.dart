@@ -83,6 +83,7 @@ class _IntensityBadge extends StatelessWidget {
       DareIntensity.casual => ('CASUAL', const Color(0xFF6b7280)),
       DareIntensity.ousado => ('OUSADO', const Color(0xFF3b82f6)),
       DareIntensity.epico => ('ÉPICO', AppColors.purpleLight),
+      DareIntensity.castigo => ('CASTIGO', AppColors.danger),
     };
 
     return Container(

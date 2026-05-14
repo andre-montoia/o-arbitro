@@ -1,0 +1,103 @@
+<h2>Roleta do Destino — Which direction?</h2>
+<p class="subtitle">The wheel spins and lands on a player. How should it feel?</p>
+
+<div class="cards">
+
+  <!-- Option A: Polished wheel with pin/ticker -->
+  <div class="card" data-choice="wheel-pin" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#0D0D1A;border-radius:12px;padding:24px;display:flex;flex-direction:column;align-items:center">
+        <!-- Pin -->
+        <div style="width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:20px solid #F59E0B;margin-bottom:-4px;z-index:10;position:relative"></div>
+        <!-- Wheel -->
+        <div style="width:200px;height:200px;border-radius:50%;position:relative;border:4px solid #7C3AED;box-shadow:0 0 30px rgba(124,58,237,0.5),inset 0 0 20px rgba(0,0,0,0.3)">
+          <!-- Segments using conic-gradient -->
+          <div style="width:100%;height:100%;border-radius:50%;background:conic-gradient(
+            #7C3AED 0deg 60deg,
+            #EC4899 60deg 120deg,
+            #3b82f6 120deg 180deg,
+            #10B981 180deg 240deg,
+            #F59E0B 240deg 300deg,
+            #8b5cf6 300deg 360deg
+          )"></div>
+          <!-- Center cap -->
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;background:#0D0D1A;border-radius:50%;border:3px solid #7C3AED;display:flex;align-items:center;justify-content:center">
+            <div style="width:8px;height:8px;background:#A855F7;border-radius:50%"></div>
+          </div>
+          <!-- Player labels at positions -->
+          <div style="position:absolute;top:12%;left:50%;transform:translateX(-50%);color:#fff;font-size:9px;font-weight:700">Ana</div>
+          <div style="position:absolute;top:38%;right:8%;color:#fff;font-size:9px;font-weight:700">Bruno</div>
+          <div style="position:absolute;bottom:18%;right:12%;color:#fff;font-size:9px;font-weight:700">Carlos</div>
+          <div style="position:absolute;bottom:18%;left:12%;color:#fff;font-size:9px;font-weight:700">Diana</div>
+          <div style="position:absolute;top:38%;left:8%;color:#fff;font-size:9px;font-weight:700">Eva</div>
+          <div style="position:absolute;top:12%;left:30%;color:#fff;font-size:9px;font-weight:700">Fábio</div>
+        </div>
+        <!-- Glow ring -->
+        <div style="margin-top:16px;background:linear-gradient(135deg,#7C3AED,#EC4899);border-radius:100px;padding:8px 28px;font-size:11px;font-weight:700;color:#fff;letter-spacing:1px">GIRAR</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Polished wheel + gold pin (recommended)</h3>
+      <p>Same wheel concept but with a gold ticker/pin at the top, glowing border, better segment contrast, and a smooth decelerate spin. Classic Wheel of Fortune feel.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Name drum / barrel -->
+  <div class="card" data-choice="drum" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#0D0D1A;border-radius:12px;padding:24px;display:flex;flex-direction:column;align-items:center">
+        <!-- Drum cylinder -->
+        <div style="position:relative;width:220px">
+          <!-- Top shadow -->
+          <div style="height:20px;background:linear-gradient(to bottom,#0D0D1A,transparent);position:relative;z-index:2"></div>
+          <!-- Visible window -->
+          <div style="background:#13132A;border:2px solid #7C3AED;border-radius:8px;overflow:hidden;position:relative">
+            <!-- Selection highlight -->
+            <div style="position:absolute;top:50%;left:0;right:0;height:44px;transform:translateY(-50%);background:rgba(124,58,237,0.15);border-top:1px solid rgba(168,85,247,0.4);border-bottom:1px solid rgba(168,85,247,0.4);z-index:1"></div>
+            <!-- Names -->
+            <div style="padding:8px 0;text-align:center">
+              <div style="padding:8px;color:rgba(255,255,255,0.25);font-size:13px">Carlos</div>
+              <div style="padding:8px;color:rgba(255,255,255,0.5);font-size:14px">Bruno</div>
+              <div style="padding:10px;color:#fff;font-size:18px;font-weight:700;position:relative;z-index:2">Ana</div>
+              <div style="padding:8px;color:rgba(255,255,255,0.5);font-size:14px">Diana</div>
+              <div style="padding:8px;color:rgba(255,255,255,0.25);font-size:13px">Eva</div>
+            </div>
+          </div>
+          <!-- Bottom shadow -->
+          <div style="height:20px;background:linear-gradient(to top,#0D0D1A,transparent);position:relative;z-index:2;margin-top:-2px"></div>
+        </div>
+        <!-- Arrows pointing at center -->
+        <div style="display:flex;align-items:center;gap:8px;margin-top:-40px;margin-bottom:20px">
+          <div style="color:#F59E0B;font-size:16px">▶</div>
+          <div style="width:180px"></div>
+          <div style="color:#F59E0B;font-size:16px">◀</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#7C3AED,#EC4899);border-radius:100px;padding:8px 28px;font-size:11px;font-weight:700;color:#fff;letter-spacing:1px">GIRAR</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Vertical drum / barrel picker</h3>
+      <p>iOS-style name picker drum that spins vertically and snaps to a winner. Clean, modern, no drawing needed. Works especially well with many players.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Keep wheel + add explosion reveal -->
+  <div class="card" data-choice="wheel-reveal" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#0D0D1A;border-radius:12px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:12px">
+        <!-- Small wheel -->
+        <div style="width:140px;height:140px;border-radius:50%;background:conic-gradient(#7C3AED 0deg 60deg,#EC4899 60deg 120deg,#3b82f6 120deg 180deg,#10B981 180deg 240deg,#F59E0B 240deg 300deg,#8b5cf6 300deg 360deg);border:3px solid #A855F7;box-shadow:0 0 20px rgba(168,85,247,0.4)"></div>
+        <!-- Winner reveal card -->
+        <div style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(251,191,36,0.1));border:1px solid #F59E0B;border-radius:16px;padding:16px 32px;text-align:center;box-shadow:0 0 20px rgba(245,158,11,0.3)">
+          <div style="color:#F59E0B;font-size:10px;font-weight:700;letter-spacing:2px;margin-bottom:4px">O DESTINO DECIDIU</div>
+          <div style="color:#fff;font-size:24px;font-weight:800">Ana 🎉</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Keep wheel + animated winner explosion</h3>
+      <p>Keep the current wheel but add a dramatic full-screen winner reveal with particles/glow after it stops. Focus the upgrade on the reaction moment rather than the wheel itself.</p>
+    </div>
+  </div>
+
+</div>

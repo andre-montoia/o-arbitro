@@ -212,9 +212,9 @@ class _SecondaryGrid extends StatelessWidget {
             children: [
               const Text('🎡', style: TextStyle(fontSize: 32)),
               const SizedBox(height: AppSpacing.sm),
-              Text('Roleta do Destino', style: AppTextStyles.bodyStrong),
+              const Text('Roleta do Destino', style: AppTextStyles.bodyStrong),
               const SizedBox(height: AppSpacing.xs),
-              Text('Destino', style: AppTextStyles.caption),
+              const Text('Destino', style: AppTextStyles.caption),
             ],
           ),
         ),
@@ -227,9 +227,9 @@ class _SecondaryGrid extends StatelessWidget {
             children: [
               const Text('📜', style: TextStyle(fontSize: 32)),
               const SizedBox(height: AppSpacing.sm),
-              Text('Absurdity Ledger', style: AppTextStyles.bodyStrong),
+              const Text('Absurdity Ledger', style: AppTextStyles.bodyStrong),
               const SizedBox(height: AppSpacing.xs),
-              Text('Apostas', style: AppTextStyles.caption),
+              const Text('Apostas', style: AppTextStyles.caption),
             ],
           ),
         ),

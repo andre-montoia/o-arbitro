@@ -13,12 +13,14 @@ class ArbitroButton extends StatefulWidget {
     required this.onPressed,
     this.variant = ArbitroButtonVariant.primary,
     this.fullWidth = false,
+    this.isLoading = false,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final ArbitroButtonVariant variant;
   final bool fullWidth;
+  final bool isLoading;
 
   @override
   State<ArbitroButton> createState() => _ArbitroButtonState();
@@ -29,20 +31,25 @@ class _ArbitroButtonState extends State<ArbitroButton> {
 
   @override
   Widget build(BuildContext context) {
-    final isDisabled = widget.onPressed == null;
+    final isDisabled = widget.onPressed == null || widget.isLoading;
 
-    Widget child = GestureDetector(
-      onTapDown: isDisabled ? null : (_) => setState(() => _pressed = true),
-      onTapUp: isDisabled ? null : (_) {
-        setState(() => _pressed = false);
-        HapticService.instance.selection();
-        widget.onPressed?.call();
-      },
-      onTapCancel: isDisabled ? null : () => setState(() => _pressed = false),
-      child: AnimatedScale(
-        scale: _pressed ? 0.95 : 1.0,
-        duration: const Duration(milliseconds: 80),
-        child: _buildInner(),
+    Widget child = Semantics(
+      button: true,
+      label: widget.label,
+      enabled: !isDisabled,
+      child: GestureDetector(
+        onTapDown: isDisabled ? null : (_) => setState(() => _pressed = true),
+        onTapUp: isDisabled ? null : (_) {
+          setState(() => _pressed = false);
+          HapticService.instance.selection();
+          widget.onPressed?.call();
+        },
+        onTapCancel: isDisabled ? null : () => setState(() => _pressed = false),
+        child: AnimatedScale(
+          scale: _pressed ? 0.95 : 1.0,
+          duration: const Duration(milliseconds: 80),
+          child: _buildInner(),
+        ),
       ),
     );
 
@@ -54,17 +61,35 @@ class _ArbitroButtonState extends State<ArbitroButton> {
 
   Widget _buildInner() {
     return switch (widget.variant) {
-      ArbitroButtonVariant.primary     => _GradientButton(label: widget.label),
-      ArbitroButtonVariant.secondary   => _SecondaryButton(label: widget.label),
-      ArbitroButtonVariant.ghost       => _GhostButton(label: widget.label),
-      ArbitroButtonVariant.destructive => _DestructiveButton(label: widget.label),
+      ArbitroButtonVariant.primary     => _GradientButton(label: widget.label, isLoading: widget.isLoading),
+      ArbitroButtonVariant.secondary   => _SecondaryButton(label: widget.label, isLoading: widget.isLoading),
+      ArbitroButtonVariant.ghost       => _GhostButton(label: widget.label, isLoading: widget.isLoading),
+      ArbitroButtonVariant.destructive => _DestructiveButton(label: widget.label, isLoading: widget.isLoading),
     };
   }
 }
 
+class _LoadingIndicator extends StatelessWidget {
+  const _LoadingIndicator();
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+    child: const SizedBox(
+      width: 24, // Adjust size as needed
+      height: 24, // Adjust size as needed
+      child: CircularProgressIndicator(
+        color: AppColors.textPrimary,
+        strokeWidth: 2.5,
+      ),
+    ),
+  );
+}
+
 class _GradientButton extends StatelessWidget {
-  const _GradientButton({required this.label});
+  const _GradientButton({required this.label, required this.isLoading});
   final String label;
+  final bool isLoading;
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
@@ -72,13 +97,16 @@ class _GradientButton extends StatelessWidget {
       gradient: AppColors.gradientPrimary,
       borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
     ),
-    child: Text(label, style: AppTextStyles.button, textAlign: TextAlign.center),
+    child: isLoading
+        ? const _LoadingIndicator()
+        : Text(label, style: AppTextStyles.button, textAlign: TextAlign.center),
   );
 }
 
 class _SecondaryButton extends StatelessWidget {
-  const _SecondaryButton({required this.label});
+  const _SecondaryButton({required this.label, required this.isLoading});
   final String label;
+  final bool isLoading;
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
@@ -87,13 +115,16 @@ class _SecondaryButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
       border: Border.all(color: const Color(0x4DA855F7)),
     ),
-    child: Text(label, style: AppTextStyles.button.copyWith(color: AppColors.purpleLight), textAlign: TextAlign.center),
+    child: isLoading
+        ? const _LoadingIndicator()
+        : Text(label, style: AppTextStyles.button.copyWith(color: AppColors.purpleLight), textAlign: TextAlign.center),
   );
 }
 
 class _GhostButton extends StatelessWidget {
-  const _GhostButton({required this.label});
+  const _GhostButton({required this.label, required this.isLoading});
   final String label;
+  final bool isLoading;
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
@@ -101,13 +132,16 @@ class _GhostButton extends StatelessWidget {
       color: AppColors.surface2,
       borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
     ),
-    child: Text(label, style: AppTextStyles.button.copyWith(color: AppColors.textMuted), textAlign: TextAlign.center),
+    child: isLoading
+        ? const _LoadingIndicator()
+        : Text(label, style: AppTextStyles.button.copyWith(color: AppColors.textMuted), textAlign: TextAlign.center),
   );
 }
 
 class _DestructiveButton extends StatelessWidget {
-  const _DestructiveButton({required this.label});
+  const _DestructiveButton({required this.label, required this.isLoading});
   final String label;
+  final bool isLoading;
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
@@ -116,6 +150,8 @@ class _DestructiveButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
       border: Border.all(color: const Color(0x4DEF4444)),
     ),
-    child: Text(label, style: AppTextStyles.button.copyWith(color: AppColors.danger), textAlign: TextAlign.center),
+    child: isLoading
+        ? const _LoadingIndicator()
+        : Text(label, style: AppTextStyles.button.copyWith(color: AppColors.danger), textAlign: TextAlign.center),
   );
 }

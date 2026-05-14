@@ -1,34 +1,13 @@
-import 'package:json_annotation/json_annotation.dart';
-
-part 'ledger_entry.g.dart';
 
 enum BetStatus { pending, resolved }
 enum ScoreSource { slots, roulette, manual }
 
-@JsonSerializable(explicitToJson: true)
 sealed class LedgerEntry {
+  LedgerEntry({DateTime? timestamp}) : timestamp = timestamp ?? DateTime.now();
   final DateTime timestamp;
-  final String type; // Add type field
-
-  LedgerEntry({DateTime? timestamp, required this.type}) : timestamp = timestamp ?? DateTime.now();
-
-  factory LedgerEntry.fromJson(Map<String, dynamic> json) {
-    switch (json['type'] as String) {
-      case 'socialBet':
-        return SocialBet.fromJson(json);
-      case 'prediction':
-        return Prediction.fromJson(json);
-      case 'scoreEntry':
-        return ScoreEntry.fromJson(json);
-      default:
-        throw ArgumentError('Unknown LedgerEntry type: ${json['type']}');
-    }
-  }
-
-  Map<String, dynamic> toJson(); // Abstract toJson
+  Map<String, dynamic> toJson();
 }
 
-@JsonSerializable()
 class SocialBet extends LedgerEntry {
   SocialBet({
     required this.description,
@@ -37,12 +16,26 @@ class SocialBet extends LedgerEntry {
     this.status = BetStatus.pending,
     this.loser,
     super.timestamp,
-  }) : super(type: 'socialBet'); // Pass the type here
+  });
+
+  factory SocialBet.fromJson(Map<String, dynamic> json) => SocialBet(
+        description: json['description'] as String,
+        players: (json['players'] as List<dynamic>).map((e) => e as String).toList(),
+        consequence: json['consequence'] as String,
+        status: json['status'] == 'resolved' ? BetStatus.resolved : BetStatus.pending,
+        loser: json['loser'] as String?,
+        timestamp: DateTime.parse(json['timestamp'] as String),
+      );
 
   @override
-  factory SocialBet.fromJson(Map<String, dynamic> json) => _$SocialBetFromJson(json);
-  @override
-  Map<String, dynamic> toJson() => _$SocialBetToJson(this);
+  Map<String, dynamic> toJson() => {
+        'description': description,
+        'players': players,
+        'consequence': consequence,
+        'status': status == BetStatus.resolved ? 'resolved' : 'pending',
+        'loser': loser,
+        'timestamp': timestamp.toIso8601String(),
+      };
 
   final String description;
   final List<String> players;
@@ -60,7 +53,6 @@ class SocialBet extends LedgerEntry {
       );
 }
 
-@JsonSerializable()
 class Prediction extends LedgerEntry {
   Prediction({
     required this.description,
@@ -68,13 +60,27 @@ class Prediction extends LedgerEntry {
     Map<String, bool>? votes,
     this.resolved = false,
     super.timestamp,
-  })  : votes = votes ?? {},
-        super(type: 'prediction'); // Pass the type here
+  }) : votes = votes ?? {};
+
+  factory Prediction.fromJson(Map<String, dynamic> json) => Prediction(
+        description: json['description'] as String,
+        consequence: json['consequence'] as String,
+        votes: (json['votes'] as Map<String, dynamic>?)?.map(
+              (k, e) => MapEntry(k, e as bool),
+            ) ??
+            {},
+        resolved: json['resolved'] as bool? ?? false,
+        timestamp: DateTime.parse(json['timestamp'] as String),
+      );
 
   @override
-  factory Prediction.fromJson(Map<String, dynamic> json) => _$PredictionFromJson(json);
-  @override
-  Map<String, dynamic> toJson() => _$PredictionToJson(this);
+  Map<String, dynamic> toJson() => {
+        'description': description,
+        'consequence': consequence,
+        'votes': votes,
+        'resolved': resolved,
+        'timestamp': timestamp.toIso8601String(),
+      };
 
   final String description;
   final String consequence;
@@ -98,19 +104,36 @@ class Prediction extends LedgerEntry {
       );
 }
 
-@JsonSerializable()
 class ScoreEntry extends LedgerEntry {
   ScoreEntry({
     required this.player,
     required this.source,
     required this.description,
     super.timestamp,
-  }) : super(type: 'scoreEntry'); // Pass the type here
+  });
+
+  factory ScoreEntry.fromJson(Map<String, dynamic> json) => ScoreEntry(
+        player: json['player'] as String,
+        source: json['source'] == 'roulette'
+            ? ScoreSource.roulette
+            : json['source'] == 'manual'
+                ? ScoreSource.manual
+                : ScoreSource.slots,
+        description: json['description'] as String,
+        timestamp: DateTime.parse(json['timestamp'] as String),
+      );
 
   @override
-  factory ScoreEntry.fromJson(Map<String, dynamic> json) => _$ScoreEntryFromJson(json);
-  @override
-  Map<String, dynamic> toJson() => _$ScoreEntryToJson(this);
+  Map<String, dynamic> toJson() => {
+        'player': player,
+        'source': source == ScoreSource.roulette
+            ? 'roulette'
+            : source == ScoreSource.manual
+                ? 'manual'
+                : 'slots',
+        'description': description,
+        'timestamp': timestamp.toIso8601String(),
+      };
 
   final String player;
   final ScoreSource source;

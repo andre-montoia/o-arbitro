@@ -25,12 +25,8 @@ class SessionState extends InheritedWidget {
     return result!;
   }
 
-  // ── session lifecycle ───────────────────────────────────────────
-
   void startSession(Session s) => onSessionChanged(s);
   void endSession() => onSessionChanged(null);
-
-  // ── dare lifecycle ──────────────────────────────────────────────
 
   void startTimer() {
     if (session == null) return;
@@ -46,9 +42,9 @@ class SessionState extends InheritedWidget {
     if (session == null) return;
     final s1 = session!.submitVote(voter, pass);
     if (s1.currentDareState!.allVoted(s1.players.map((p) => p.name).toList())) {
-      final (s2, passed) = s1.resolveDare(); // still resolves score
+      final (s2, passed) = s1.resolveDare();
       final s3 = s2.withDareState(
-        s1.currentDareState!.copyWith(phase: DarePhase.resolved, resolvedPassed: passed)
+        s1.currentDareState!.copyWith(phase: DarePhase.resolved, resolvedPassed: passed),
       );
       onSessionChanged(s3);
     } else {
@@ -68,6 +64,7 @@ class SessionState extends InheritedWidget {
     }
   }
 
+  void completeDareAndTriggerVote() {
     if (session == null) return;
     var s = session!;
     if (s.currentDareState?.phase == DarePhase.assigned) {
@@ -84,15 +81,13 @@ class SessionState extends InheritedWidget {
 
   void useVeto(String playerName) {
     if (session == null) return;
-    onSessionChanged(session!.useVeto(playerName));
+    onSessionChanged(session!.useVeto(playerName).withDareState(null));
   }
 
   void completeDare(String playerName) {
     if (session == null) return;
     onSessionChanged(session!.completeDare(playerName));
   }
-
-  // ── spin results ────────────────────────────────────────────────
 
   void addSpinResult(SpinResult result) {
     if (session == null) return;
@@ -103,8 +98,6 @@ class SessionState extends InheritedWidget {
     if (session == null) return;
     onSessionChanged(session!.addRouletteResult(result));
   }
-
-  // ── ledger ──────────────────────────────────────────────────────
 
   void addLedgerEntry(LedgerEntry entry) {
     if (session == null) return;

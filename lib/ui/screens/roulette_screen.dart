@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
@@ -22,6 +21,7 @@ class _RouletteScreenState extends State<RouletteScreen> {
   final _questionController = TextEditingController();
   final _wheelKey = GlobalKey<RouletteWheelState>();
   String? _winner;
+  String? _lastWinner;
   bool _showOverlay = false;
 
   @override
@@ -51,6 +51,7 @@ class _RouletteScreenState extends State<RouletteScreen> {
   void _onSpinComplete(String winner) {
     setState(() {
       _winner = winner;
+      _lastWinner = winner;
       _showOverlay = true;
     });
   }
@@ -71,6 +72,22 @@ class _RouletteScreenState extends State<RouletteScreen> {
   Widget build(BuildContext context) {
     final players = SessionState.of(context).session?.players.map((p) => p.name).toList() ?? [];
 
+    if (players.isEmpty) {
+      return Scaffold(
+        backgroundColor: AppColors.bgPrimary,
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.group_off_rounded, color: AppColors.textDisabled, size: 48),
+              const SizedBox(height: 16),
+              Text('Inicia uma sessão primeiro', style: AppTextStyles.body),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.bgPrimary,
       body: Stack(
@@ -85,6 +102,15 @@ class _RouletteScreenState extends State<RouletteScreen> {
                   const SizedBox(height: AppSpacing.xxl),
                   ArbitroInput(controller: _questionController, hint: 'Qual a questão a decidir?'),
                   const SizedBox(height: AppSpacing.xxl),
+                  if (_lastWinner != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Text(
+                        'Última volta: $_lastWinner',
+                        style: AppTextStyles.body.copyWith(color: AppColors.gold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   Center(
                     child: RouletteWheel(
                       key: _wheelKey,
@@ -134,7 +160,6 @@ class _WinnerOverlayState extends State<_WinnerOverlay> with SingleTickerProvide
   late final Animation<double> _fade;
   late final Animation<double> _scale;
   late final List<_Particle> _particles;
-  Timer? _autoTimer;
 
   @override
   void initState() {
@@ -152,12 +177,10 @@ class _WinnerOverlayState extends State<_WinnerOverlay> with SingleTickerProvide
     ));
 
     _ctrl.forward();
-    _autoTimer = Timer(const Duration(seconds: 4), widget.onDismiss);
   }
 
   @override
   void dispose() {
-    _autoTimer?.cancel();
     _ctrl.dispose();
     super.dispose();
   }
@@ -176,7 +199,6 @@ class _WinnerOverlayState extends State<_WinnerOverlay> with SingleTickerProvide
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Particle burst
                   AnimatedBuilder(
                     animation: _ctrl,
                     builder: (_, __) => CustomPaint(
@@ -184,7 +206,6 @@ class _WinnerOverlayState extends State<_WinnerOverlay> with SingleTickerProvide
                       painter: _ParticlePainter(_particles, _ctrl.value),
                     ),
                   ),
-                  // Winner card
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 28),
                     decoration: BoxDecoration(
@@ -244,7 +265,7 @@ class _ParticlePainter extends CustomPainter {
     for (final p in particles) {
       final dist = p.speed * t;
       final pos = center + Offset(cos(p.angle) * dist, sin(p.angle) * dist);
-      canvas.drawCircle(pos, p.radius * (1 - t * 0.5), Paint()..color = p.color.withOpacity(1 - t));
+      canvas.drawCircle(pos, p.radius * (1 - t * 0.5), Paint()..color = p.color.withAlpha((255 * (1 - t)).toInt()));
     }
   }
 

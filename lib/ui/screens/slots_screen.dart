@@ -7,6 +7,7 @@ import '../../services/haptic_service.dart';
 import '../../services/sound_service.dart';
 import '../components/arbitro_badge.dart';
 import '../components/arbitro_button.dart';
+import '../components/dare_result_overlay.dart';
 import '../components/dare_timer_card.dart';
 import '../components/dare_vote_card.dart';
 import '../components/glass_card.dart';
@@ -85,8 +86,8 @@ class _SlotsScreenState extends State<SlotsScreen> {
         DareIntensity.casual => 'CASUAL',
         DareIntensity.ousado => 'OUSADO',
         DareIntensity.epico => 'ÉPICO',
+        DareIntensity.castigo => 'CASTIGO',
       };
-
   BadgeVariant _intensityBadgeVariant(String intensity) => switch (intensity) {
         'CASUAL' => BadgeVariant.purple,
         'OUSADO' => BadgeVariant.pink,
@@ -163,7 +164,7 @@ class _SlotsScreenState extends State<SlotsScreen> {
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: ArbitroButton(
-                    label: 'VETAR (${ss.session!.players.firstWhere((p) => p.name == dareState.player).vetoTokens})',
+                    label: 'VETAR ${ss.session!.players.firstWhere((p) => p.name == dareState.player).vetoTokens}',
                     variant: ArbitroButtonVariant.ghost,
                     onPressed: ss.session!.players.firstWhere((p) => p.name == dareState.player).vetoTokens > 0
                         ? () {
@@ -193,7 +194,7 @@ class _SlotsScreenState extends State<SlotsScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.group_off_rounded, size: 80, color: AppColors.textLight),
+              const Icon(Icons.group_off_rounded, size: 80, color: AppColors.textLight),
               const SizedBox(height: AppSpacing.md),
               Text(
                 'Inicia uma sessão primeiro',
