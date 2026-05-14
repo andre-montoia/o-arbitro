@@ -1,5 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
 
+part 'player.g.dart';
 
+@JsonSerializable()
 class Player {
   const Player({
     required this.name,
@@ -9,22 +12,6 @@ class Player {
     this.streak = 0,
   });
 
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'vetoTokens': vetoTokens,
-        'daresCompleted': daresCompleted,
-        'score': score,
-        'streak': streak,
-      };
-
-  factory Player.fromJson(Map<String, dynamic> j) => Player(
-        name: j['name'] as String,
-        vetoTokens: j['vetoTokens'] as int? ?? 2,
-        daresCompleted: j['daresCompleted'] as int? ?? 0,
-        score: j['score'] as int? ?? 0,
-        streak: j['streak'] as int? ?? 0,
-      );
-
   final String name;
   final int vetoTokens;
   final int daresCompleted;
@@ -33,6 +20,9 @@ class Player {
 
   bool get canVeto => vetoTokens > 0;
   bool get isOnFire => streak >= 3;
+
+  factory Player.fromJson(Map<String, dynamic> json) => _$PlayerFromJson(json);
+  Map<String, dynamic> toJson() => _$PlayerToJson(this);
 
   Player useVeto() => _copyWith(vetoTokens: vetoTokens - 1, streak: 0);
   Player earnVeto() => _copyWith(vetoTokens: vetoTokens + 1);
@@ -58,4 +48,3 @@ class Player {
         streak: streak ?? this.streak,
       );
 }
-

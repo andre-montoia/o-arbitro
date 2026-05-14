@@ -1,9 +1,13 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'player.dart';
 import 'spin_result.dart';
 import 'roulette_result.dart';
 import 'ledger_entry.dart';
 import 'dare_state.dart';
 
+part 'session.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class Session {
   Session({
     required List<Player> players,
@@ -13,16 +17,19 @@ class Session {
     this.currentDareState,
   })  : assert(players.length >= 2, 'Session requires at least 2 players'),
         assert(players.length <= 8, 'Session allows max 8 players'),
-        players = List.unmodifiable(players),
-        slotsHistory = List.unmodifiable(slotsHistory ?? []),
-        rouletteHistory = List.unmodifiable(rouletteHistory ?? []),
-        ledgerEntries = List.unmodifiable(ledgerEntries ?? []);
+        this.players = List.unmodifiable(players),
+        this.slotsHistory = List.unmodifiable(slotsHistory ?? []),
+        this.rouletteHistory = List.unmodifiable(rouletteHistory ?? []),
+        this.ledgerEntries = List.unmodifiable(ledgerEntries ?? []);
 
   final List<Player> players;
   final List<SpinResult> slotsHistory;
   final List<RouletteResult> rouletteHistory;
   final List<LedgerEntry> ledgerEntries;
   final DareState? currentDareState;
+
+  factory Session.fromJson(Map<String, dynamic> json) => _$SessionFromJson(json);
+  Map<String, dynamic> toJson() => _$SessionToJson(this);
 
   // ── dare lifecycle ──────────────────────────────────────────────
 
@@ -73,7 +80,7 @@ class Session {
     final passed = ds.isPassed(players.map((p) => p.name).toList());
     final updated = players.map((p) {
       if (p.name != ds.player) return p;
-      return passed ? p.addScore() : p.resetStreak();
+      return passed ? p.addScore(100) : p.resetStreak();
     }).toList();
     return (_copyWith(players: updated, dareState: null), passed);
   }
