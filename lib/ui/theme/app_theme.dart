@@ -57,12 +57,8 @@ abstract final class AppTheme {
       type: BottomNavigationBarType.fixed,
       elevation: 0,
     ),
-    pageTransitionsTheme: const PageTransitionsTheme(
-      builders: {
-        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-      },
-    ),
+    // Use default page transitions (Material on Android, Cupertino on iOS)
+    // pageTransitionsTheme removed for build compatibility
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: AppColors.surface,
       shape: RoundedRectangleBorder(

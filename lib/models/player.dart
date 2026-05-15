@@ -6,6 +6,7 @@ part 'player.g.dart';
 class Player {
   const Player({
     required this.name,
+    this.avatarId = 'default',
     this.vetoTokens = 2,
     this.daresCompleted = 0,
     this.score = 0,
@@ -13,6 +14,7 @@ class Player {
   });
 
   final String name;
+  final String avatarId;
   final int vetoTokens;
   final int daresCompleted;
   final int score;
@@ -23,6 +25,7 @@ class Player {
 
   factory Player.fromJson(Map<String, dynamic> json) => Player(
         name: json['name'] as String,
+        avatarId: json['avatarId'] as String? ?? 'default',
         vetoTokens: (json['vetoTokens'] as num?)?.toInt() ?? 2,
         daresCompleted: (json['daresCompleted'] as num?)?.toInt() ?? 0,
         score: (json['score'] as num?)?.toInt() ?? 0,
@@ -31,6 +34,7 @@ class Player {
 
   Map<String, dynamic> toJson() => {
         'name': name,
+        'avatarId': avatarId,
         'vetoTokens': vetoTokens,
         'daresCompleted': daresCompleted,
         'score': score,
@@ -48,6 +52,7 @@ class Player {
   Player resetStreak() => _copyWith(streak: 0);
 
   Player _copyWith({
+    String? avatarId,
     int? vetoTokens,
     int? daresCompleted,
     int? score,
@@ -55,6 +60,7 @@ class Player {
   }) =>
       Player(
         name: name,
+        avatarId: avatarId ?? this.avatarId,
         vetoTokens: vetoTokens ?? this.vetoTokens,
         daresCompleted: daresCompleted ?? this.daresCompleted,
         score: score ?? this.score,

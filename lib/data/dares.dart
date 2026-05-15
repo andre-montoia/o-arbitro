@@ -130,4 +130,15 @@ abstract final class Dares {
     'O grupo escolhe uma pose — ficas assim durante 1 minuto inteiro',
     'Faz 3 declarações sobre ti mesmo — o grupo vota em qual é mentira',
   ];
+
+  static List<String> get allDares {
+    final all = <String>[];
+    for (final categoryEntry in _content.entries) {
+      for (final intensityEntry in categoryEntry.value.entries) {
+        all.addAll(intensityEntry.value);
+      }
+    }
+    all.addAll(_punishment);
+    return all;
+  }
 }

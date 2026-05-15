@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/session_state.dart';
+import '../../models/player.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../theme/app_spacing.dart';

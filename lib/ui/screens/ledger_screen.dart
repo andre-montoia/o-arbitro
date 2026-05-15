@@ -6,9 +6,11 @@ import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../theme/app_spacing.dart';
 import '../components/glass_card.dart';
+import '../components/arbitro_badge.dart';
 import '../components/arbitro_button.dart';
 import '../components/new_ledger_entry_sheet.dart';
 import '../components/avatar_icon.dart';
+import '../components/animated_background.dart';
 
 // Duration for the slide-in animation when a new entry is added
 const _kEntryAnimDuration = Duration(milliseconds: 400);
@@ -73,8 +75,7 @@ class _LedgerScreenState extends State<LedgerScreen> {
     final filtered = _filtered(entries);
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.gradientDark),
+      body: AnimatedBackground(
         child: SafeArea(
           child: Column(
             children: [
@@ -172,21 +173,30 @@ class _Leaderboard extends StatelessWidget {
       ..sort((a, b) => b.daresCompleted.compareTo(a.daresCompleted));
 
     return GlassCard(
+      variant: GlassCardVariant.highlighted,
+      padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Classificação', style: AppTextStyles.label),
-          const SizedBox(height: AppSpacing.sm),
+          const Text('CLASSIFICAÇÃO', style: AppTextStyles.label),
+          const SizedBox(height: AppSpacing.md),
           ...sorted.map((p) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                 child: Row(
                   children: [
-                    AvatarIcon(id: p.avatarId, size: 16),
-                    const SizedBox(width: AppSpacing.sm),
+                    AvatarIcon(id: p.avatarId, size: 18),
+                    const SizedBox(width: AppSpacing.md),
                     Text(p.name, style: AppTextStyles.bodyStrong),
                     const Spacer(),
-                    Text('${p.daresCompleted} desafios',
-                        style: AppTextStyles.caption),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface2,
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Text('${p.daresCompleted} 🔥',
+                        style: AppTextStyles.caption.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold)),
+                    ),
                   ],
                 ),
               )),
@@ -210,18 +220,21 @@ class _FilterChip extends StatelessWidget {
   Widget build(BuildContext context) => GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: selected ? AppColors.purple : AppColors.surface2,
+            color: selected ? AppColors.purple : AppColors.glassFill,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: selected ? AppColors.purpleLight : AppColors.border,
+              color: selected ? AppColors.purpleLight : AppColors.glassBorder,
+              width: 1,
             ),
+            boxShadow: selected ? AppSpacing.glowPurple(intensity: 0.2) : null,
           ),
           child: Text(
             label,
             style: AppTextStyles.label.copyWith(
               color: selected ? AppColors.textPrimary : AppColors.textMuted,
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
         ),
@@ -419,9 +432,7 @@ class _PredictionCard extends StatelessWidget {
             const Text('PREVISÃO', style: AppTextStyles.label),
             const Spacer(),
             if (prediction.resolved)
-              Text('RESOLVIDA',
-                  style:
-                      AppTextStyles.label.copyWith(color: AppColors.success)),
+              const ArbitroBadge(label: 'RESOLVIDA', variant: BadgeVariant.green),
           ]),
           const SizedBox(height: AppSpacing.sm),
           Text(prediction.description, style: AppTextStyles.bodyStrong),
@@ -485,20 +496,25 @@ class _ScoreCard extends StatelessWidget {
     return GlassCard(
       child: Row(
         children: [
-          AvatarIcon(id: player.avatarId, size: 20),
+          Container(
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+            ),
+            child: AvatarIcon(id: player.avatarId, size: 24),
+          ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(score.player, style: AppTextStyles.bodyStrong),
-                Text(score.description, style: AppTextStyles.caption),
+                Text(score.description, style: AppTextStyles.caption.copyWith(color: AppColors.textMuted)),
               ],
             ),
           ),
-          Text('+1',
-              style:
-                  AppTextStyles.heading.copyWith(color: AppColors.success)),
+          const ArbitroBadge(label: '+1', variant: BadgeVariant.green),
         ],
       ),
     );

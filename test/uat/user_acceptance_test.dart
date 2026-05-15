@@ -1,3 +1,4 @@
+import 'package:o_arbitro/ui/components/player_chip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:o_arbitro/navigation/app_router.dart';
@@ -49,7 +50,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Sessão activa'), findsOneWidget);
-      expect(find.text('Ana · Bruno'), findsOneWidget);
+      expect(find.descendant(of: find.byType(PlayerChip), matching: find.text('Ana')), findsOneWidget);
+      expect(find.descendant(of: find.byType(PlayerChip), matching: find.text('Bruno')), findsOneWidget);
     });
 
     testWidgets('cannot confirm with fewer than 2 names filled', (tester) async {

@@ -4,9 +4,17 @@ import '../models/session_state.dart';
 import '../services/session_persistence.dart';
 import '../ui/components/score_hud.dart';
 import '../ui/screens/lobby_screen.dart';
+import '../ui/screens/speed_dare_screen.dart';
+import '../ui/screens/never_have_i_ever_screen.dart';
+import '../ui/screens/would_you_rather_screen.dart';
+import '../ui/screens/truth_or_dare_wheel_screen.dart';
+import '../ui/screens/most_likely_screen.dart';
 import '../ui/screens/slots_screen.dart';
 import '../ui/screens/roulette_screen.dart';
 import '../ui/screens/ledger_screen.dart';
+import '../ui/screens/theme_packs_screen.dart';
+import '../ui/screens/session_history_screen.dart';
+import '../ui/screens/custom_dare_creator_screen.dart';
 import '../ui/theme/app_colors.dart';
 import '../ui/theme/app_text_styles.dart';
 
@@ -89,6 +97,11 @@ class _AppRouterState extends State<AppRouter> {
               BottomNavigationBarItem(icon: Icon(Icons.casino_rounded), label: 'Slots'),
               BottomNavigationBarItem(icon: Icon(Icons.radio_button_checked_rounded), label: 'Roleta'),
               BottomNavigationBarItem(icon: Icon(Icons.receipt_long_rounded), label: 'Ledger'),
+              BottomNavigationBarItem(icon: Icon(Icons.people_rounded), label: 'Mais Provável'),
+              BottomNavigationBarItem(icon: Icon(Icons.flash_on_rounded), label: 'Speed Dare'),
+              BottomNavigationBarItem(icon: Icon(Icons.fingerprint_rounded), label: 'Never Have'),
+              BottomNavigationBarItem(icon: Icon(Icons.help_outline_rounded), label: 'Would You'),
+              BottomNavigationBarItem(icon: Icon(Icons.sync_rounded), label: 'Truth/Dare'),
             ],
           ),
         ),
@@ -103,6 +116,11 @@ class _AppRouterState extends State<AppRouter> {
       1 => const SlotsScreen(),
       2 => const RouletteScreen(),
       3 => const LedgerScreen(),
+      4 => const MostLikelyScreen(),
+      5 => const SpeedDareScreen(playerCount: 4),
+      6 => const NeverHaveIEverScreen(playerCount: 4),
+      7 => const WouldYouRatherScreen(playerCount: 4),
+      8 => const TruthOrDareWheelScreen(playerCount: 4),
       _ => const LobbyScreen(),
     };
   }

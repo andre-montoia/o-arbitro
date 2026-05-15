@@ -22,7 +22,7 @@ DareState _$DareStateFromJson(Map<String, dynamic> json) => DareState(
   timerStartedAt: json['timerStartedAt'] == null
       ? null
       : DateTime.parse(json['timerStartedAt'] as String),
-  resolvedPassed: json['resolvedPassed'] as bool?,
+  resolvedPassed: json['resolvedPassed'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$DareStateToJson(DareState instance) => <String, dynamic>{

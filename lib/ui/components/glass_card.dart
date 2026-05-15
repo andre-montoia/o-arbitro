@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 
-enum GlassCardVariant { defaultCard, highlighted, gold, danger, surface }
+enum GlassCardVariant { defaultCard, highlighted, gold, danger, surface, glowing }
 
 class GlassCard extends StatelessWidget {
   const GlassCard({
@@ -51,21 +51,26 @@ class GlassCard extends StatelessWidget {
         AppColors.border,
         null,
       ),
+      GlassCardVariant.glowing => (
+        AppColors.glassFill, // Deep purple from theme
+        AppColors.purpleLight, // Lighter purple border
+        AppColors.pink, // Bright pink glow color
+      ),
     };
 
     final shadows = <BoxShadow>[
       BoxShadow(
         color: Colors.black.withValues(alpha: 0.2),
-        blurRadius: 8,
-        offset: const Offset(0, 2),
+        blurRadius: 32, // Research: 15-25% blur, 32px for premium
+        offset: const Offset(0, 8), // Research: deeper shadow for depth
       ),
     ];
 
     if (glowColor != null) {
       shadows.add(
         BoxShadow(
-          color: glowColor.withValues(alpha: 0.25),
-          blurRadius: 24,
+          color: glowColor.withValues(alpha: 0.3),
+          blurRadius: 32, // Research: 32px for addictive glow
           spreadRadius: -4,
         ),
       );
@@ -74,11 +79,15 @@ class GlassCard extends StatelessWidget {
     Widget card = Container(
       margin: margin,
       child: GestureDetector(
-        onTap: onTap,
+        onTap: () {
+          onTap?.call();
+          // Add haptic feedback for addictive feel
+          // HapticFeedback.lightImpact(); // Uncomment when haptic_service is integrated
+        },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16), // Research: 12-20 range, 16 for premium
             child: Container(
               padding: cardPad,
               decoration: BoxDecoration(

@@ -16,10 +16,10 @@ abstract final class AppTextStyles {
   static const TextStyle display = TextStyle(
     fontFamily: 'Syne',
     fontWeight: FontWeight.w800,
-    fontSize: 32,
+    fontSize: 36, // Research: 32-40pt for maximum impact
     color: AppColors.textPrimary,
     height: 1.1,
-    letterSpacing: -0.5,
+    letterSpacing: -1.0, // Research: negative tracking for large headlines
   );
 
   static const TextStyle displaySmall = TextStyle(
@@ -37,9 +37,9 @@ abstract final class AppTextStyles {
   static const TextStyle heading = TextStyle(
     fontFamily: 'Syne',
     fontWeight: FontWeight.w700,
-    fontSize: 20,
+    fontSize: 22, // Research: 18-22pt for sub-headers
     color: AppColors.textPrimary,
-    height: 1.2,
+    height: 1.3,
   );
 
   static const TextStyle headingSmall = TextStyle(
@@ -57,9 +57,9 @@ abstract final class AppTextStyles {
   static const TextStyle body = TextStyle(
     fontFamily: 'SpaceGrotesk',
     fontWeight: FontWeight.w500,
-    fontSize: 14,
-    color: AppColors.textMuted,  // Now #B8B8D8 — much more readable
-    height: 1.4,
+    fontSize: 17, // Research: 17-18pt for premium readability
+    color: AppColors.textMuted, // Now #B8B8D8 — much more readable
+    height: 1.6, // Research: 1.5-1.6 for premium feel
   );
 
   static const TextStyle bodyStrong = TextStyle(

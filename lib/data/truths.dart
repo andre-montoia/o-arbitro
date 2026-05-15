@@ -1,0 +1,23 @@
+/// Truth prompts for Truth or Dare Wheel
+const List<String> allTruths = [
+  'Qual é a sua maior vergonha?',
+  'Já beijou alguém nesta sala?',
+  'Qual é o seu maior medo?',
+  'Qual foi a coisa mais embaraçosa que aconteceu com você?',
+  'Se pudesse ter um superpoder, qual seria?',
+  'Qual é a sua maior conquista na vida?',
+  'Já contou uma mentira hoje? Qual?',
+  'Qual é a pessoa mais estranha que você já conheceu?',
+  'Qual foi o pior presente que você já ganhou?',
+  'Se você pudesse mudar uma decisão do passado, qual seria?',
+  'Qual é o seu maior sonho?',
+  'Já chorou assistindo a um filme? Qual?',
+  'Qual é a coisa mais corajosa que você já fez?',
+  'Se pudesse viajar no tempo, para onde iria?',
+  'Qual é o seu maior arrependimento?',
+  'Já traiu um amigo? Como?',
+  'Qual é o seu maior medo em um relacionamento?',
+  'Se pudesse ser famoso por uma hora, o que faria?',
+  'Qual é a coisa mais estranha que você já comeu?',
+  'Já se apaixonou por alguém sem que a pessoa soubesse?',
+];

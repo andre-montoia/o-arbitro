@@ -6,6 +6,7 @@ import '../../services/sound_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text_styles.dart';
+import 'arbitro_badge.dart';
 import 'glass_card.dart';
 
 class DareVoteCard extends StatelessWidget {
@@ -128,20 +129,6 @@ class _CastigoBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!isPunishment) return const SizedBox.shrink();
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.danger.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.danger.withValues(alpha: 0.3)),
-      ),
-      child: Text(
-        'CASTIGO',
-        style: AppTextStyles.label.copyWith(
-          color: AppColors.danger,
-          fontSize: 10,
-        ),
-      ),
-    );
+    return const ArbitroBadge(label: 'CASTIGO', variant: BadgeVariant.pink);
   }
 }

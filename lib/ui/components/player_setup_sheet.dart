@@ -103,7 +103,8 @@ class _PlayerSetupSheetState extends State<PlayerSetupSheet> {
   }
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) {
+    return Padding(
         padding: EdgeInsets.only(
           left: AppSpacing.lg,
           right: AppSpacing.lg,
@@ -177,4 +178,5 @@ class _PlayerSetupSheetState extends State<PlayerSetupSheet> {
           ],
         ),
       );
+  }
 }

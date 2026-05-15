@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
 
 /// Responsive breakpoint system for O Árbitro
 /// Handles everything from iPhone SE (375px) to iPad (1024px+)
@@ -105,12 +106,12 @@ abstract final class AppSpacing {
 
   static List<BoxShadow> glowPurple({double intensity = 0.4}) => [
         BoxShadow(
-          color: const Color(0xFF7C3AED).withValues(alpha: intensity),
+          color: AppColors.purple.withValues(alpha: intensity),
           blurRadius: 20,
           spreadRadius: -2,
         ),
         BoxShadow(
-          color: const Color(0xFF7C3AED).withValues(alpha: intensity * 0.5),
+          color: AppColors.purple.withValues(alpha: intensity * 0.5),
           blurRadius: 40,
           spreadRadius: -8,
         ),
@@ -118,12 +119,12 @@ abstract final class AppSpacing {
 
   static List<BoxShadow> glowGold({double intensity = 0.4}) => [
         BoxShadow(
-          color: const Color(0xFFF59E0B).withValues(alpha: intensity),
+          color: AppColors.gold.withValues(alpha: intensity),
           blurRadius: 16,
           spreadRadius: -2,
         ),
         BoxShadow(
-          color: const Color(0xFFF59E0B).withValues(alpha: intensity * 0.4),
+          color: AppColors.gold.withValues(alpha: intensity * 0.4),
           blurRadius: 32,
           spreadRadius: -8,
         ),
@@ -131,12 +132,12 @@ abstract final class AppSpacing {
 
   static List<BoxShadow> glowPink({double intensity = 0.4}) => [
         BoxShadow(
-          color: const Color(0xFFEC4899).withValues(alpha: intensity),
+          color: AppColors.pink.withValues(alpha: intensity),
           blurRadius: 16,
           spreadRadius: -2,
         ),
         BoxShadow(
-          color: const Color(0xFFEC4899).withValues(alpha: intensity * 0.4),
+          color: AppColors.pink.withValues(alpha: intensity * 0.4),
           blurRadius: 32,
           spreadRadius: -8,
         ),
@@ -144,12 +145,12 @@ abstract final class AppSpacing {
 
   static List<BoxShadow> glowEmerald({double intensity = 0.4}) => [
         BoxShadow(
-          color: const Color(0xFF10B981).withValues(alpha: intensity),
+          color: AppColors.emerald.withValues(alpha: intensity),
           blurRadius: 16,
           spreadRadius: -2,
         ),
         BoxShadow(
-          color: const Color(0xFF10B981).withValues(alpha: intensity * 0.4),
+          color: AppColors.emerald.withValues(alpha: intensity * 0.4),
           blurRadius: 32,
           spreadRadius: -8,
         ),
@@ -157,12 +158,12 @@ abstract final class AppSpacing {
 
   static List<BoxShadow> glowDanger({double intensity = 0.4}) => [
         BoxShadow(
-          color: const Color(0xFFEF4444).withValues(alpha: intensity),
+          color: AppColors.danger.withValues(alpha: intensity),
           blurRadius: 16,
           spreadRadius: -2,
         ),
         BoxShadow(
-          color: const Color(0xFFEF4444).withValues(alpha: intensity * 0.4),
+          color: AppColors.danger.withValues(alpha: intensity * 0.4),
           blurRadius: 32,
           spreadRadius: -8,
         ),

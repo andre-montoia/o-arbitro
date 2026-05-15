@@ -6,6 +6,12 @@ void main() {
     const p = Player(name: 'João');
     expect(p.vetoTokens, 2);
     expect(p.daresCompleted, 0);
+    expect(p.avatarId, 'default');
+  });
+
+  test('player supports custom avatarId', () {
+    const p = Player(name: 'Maria', avatarId: 'joker');
+    expect(p.avatarId, 'joker');
   });
 
   test('player can use a veto token', () {

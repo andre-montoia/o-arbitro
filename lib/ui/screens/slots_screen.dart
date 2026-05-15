@@ -11,8 +11,10 @@ import '../components/dare_result_overlay.dart';
 import '../components/dare_timer_card.dart';
 import '../components/dare_vote_card.dart';
 import '../components/glass_card.dart';
+import '../components/glowing_glass_card.dart';
 import '../components/slot_machine.dart';
 import '../components/avatar_icon.dart';
+import '../components/animated_background.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text_styles.dart';
@@ -210,8 +212,7 @@ class _SlotsScreenState extends State<SlotsScreen> {
     final dareState = session.currentDareState;
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.gradientDark),
+      body: AnimatedBackground(
         child: SafeArea(
           child: SingleChildScrollView(
             padding: EdgeInsets.all(AppSpacing.screenPadding(context)),
@@ -233,8 +234,7 @@ class _SlotsScreenState extends State<SlotsScreen> {
                     ? const SizedBox.shrink()
                     : AspectRatio(
                         aspectRatio: 16 / 9,
-                        child: GlassCard(
-                          variant: GlassCardVariant.highlighted,
+                        child: GlowingGlassCard(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -277,6 +277,7 @@ class _SlotsScreenState extends State<SlotsScreen> {
                 ArbitroButton(
                   label: 'GIRAR',
                   onPressed: _doSpin,
+                  variant: ArbitroButtonVariant.emerald,
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 const Text('JOGADORES', style: AppTextStyles.label),
@@ -285,18 +286,21 @@ class _SlotsScreenState extends State<SlotsScreen> {
                   spacing: AppSpacing.sm,
                   runSpacing: AppSpacing.sm,
                   children: session.players.map((p) => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppColors.surface2,
-                      borderRadius: BorderRadius.circular(100),
-                      border: Border.all(color: AppColors.border),
+                      color: AppColors.glassFill,
+                      borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                      border: Border.all(color: AppColors.glassBorder, width: 1),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         AvatarIcon(id: p.avatarId, size: 14),
                         const SizedBox(width: 8),
-                        Text(p.name, style: AppTextStyles.caption.copyWith(color: AppColors.textPrimary)),
+                        Text(p.name, style: AppTextStyles.caption.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.bold,
+                        )),
                       ],
                     ),
                   )).toList(),

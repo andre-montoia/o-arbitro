@@ -3,26 +3,18 @@
 ## What this is
 Flutter mobile app (iOS + Android) — a party game with 3 mini-games: Social Slots, Roleta do Destino, and Absurdity Ledger. Dark premium UI, Portuguese language. No backend — pure in-memory session state.
 
-## Current state (2026-04-24)
-**v0.2.0 complete.** All 3 games fully implemented and merged to master. APK released at:
-https://github.com/andre-montoia/o-arbitro/releases/tag/v0.2.0-debug
-
-34 tests passing. Branch `feature/game-mechanics` merged into master. ScoreHud component added.
+## Current state (2026-05-15)
+**v0.3.0 complete.** UX foundation established.
+- Comprehensive Design System and Asset Manifest created in `docs/ux/`.
+- Player Avatar system implemented (Model + Selection UI + Lobby display).
+- API keys configured for high-res asset generation.
 
 ## Key files
-- `lib/main.dart` — app entry, theme wiring
-- `lib/navigation/app_router.dart` — bottom nav + SessionState provider + locked tab gate
-- `lib/models/session.dart` — immutable Session model
-- `lib/models/session_state.dart` — InheritedWidget, use `SessionState.of(context)`
-- `lib/models/player.dart` — Player(name, vetoTokens=2, daresCompleted)
-- `lib/models/ledger_entry.dart` — sealed class: SocialBet, Prediction, ScoreEntry
-- `lib/models/spin_result.dart` — SpinResult + DareCategory/DareIntensity enums
-- `lib/data/dares.dart` — 60 hardcoded dares, `Dares.random(category, intensity)`
-- `lib/ui/screens/lobby_screen.dart` — session start/reset, links to games
-- `lib/ui/screens/slots_screen.dart` — slot machine with dare reveal + veto
-- `lib/ui/screens/roulette_screen.dart` — spinning wheel (CustomPainter) + winner reveal
-- `lib/ui/screens/ledger_screen.dart` — bets, predictions, scores, leaderboard
-- `lib/ui/components/` — ArbitroButton, GlassCard, ArbitroBadge, SlotMachine, DareResultCard, RouletteWheel, PlayerSetupSheet, NewLedgerEntrySheet
+- `docs/ux/DESIGN_SYSTEM.md` — Visual identity & standards
+- `docs/ux/ASSET_MANIFEST.md` — specifications for icons/images
+- `lib/models/player.dart` — Updated with `avatarId`
+- `lib/ui/components/player_setup_sheet.dart` — Added Avatar Picker
+- `lib/ui/screens/lobby_screen.dart` — Updated with Player Chips & Avatars
 
 ## Design tokens
 - `lib/ui/theme/app_colors.dart` — AppColors.*

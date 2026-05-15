@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
@@ -7,6 +6,9 @@ import '../components/arbitro_button.dart';
 import '../components/arbitro_input.dart';
 import '../components/roulette_wheel.dart';
 import '../components/avatar_icon.dart';
+import '../components/glass_card.dart';
+import '../components/animated_background.dart';
+import '../components/confetti_effect.dart';
 import '../../models/session_state.dart';
 import '../../models/roulette_result.dart';
 import '../../models/ledger_entry.dart';
@@ -90,9 +92,7 @@ class _RouletteScreenState extends State<RouletteScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.bgPrimary,
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.gradientDark),
+      body: AnimatedBackground(
         child: Stack(
           children: [
             SafeArea(
@@ -142,6 +142,7 @@ class _RouletteScreenState extends State<RouletteScreen> {
                         label: 'GIRAR',
                         onPressed: () => _wheelKey.currentState?.spin(),
                         fullWidth: true,
+                        variant: ArbitroButtonVariant.emerald,
                       )
                     else ...[
                       ArbitroButton(
@@ -177,22 +178,13 @@ class _WinnerOverlayState extends State<_WinnerOverlay> with SingleTickerProvide
   late final AnimationController _ctrl;
   late final Animation<double> _fade;
   late final Animation<double> _scale;
-  late final List<_Particle> _particles;
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
     _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeIn);
     _scale = CurvedAnimation(parent: _ctrl, curve: Curves.elasticOut);
-
-    final rng = Random();
-    _particles = List.generate(20, (i) => _Particle(
-      angle: rng.nextDouble() * 2 * pi,
-      speed: 60 + rng.nextDouble() * 80,
-      radius: 3 + rng.nextDouble() * 4,
-      color: [AppColors.gold, AppColors.purpleLight, AppColors.pink, Colors.white][rng.nextInt(4)],
-    ));
 
     _ctrl.forward();
   }
@@ -213,32 +205,17 @@ class _WinnerOverlayState extends State<_WinnerOverlay> with SingleTickerProvide
       child: FadeTransition(
         opacity: _fade,
         child: Container(
-          color: Colors.black54,
-          child: Center(
-            child: ScaleTransition(
-              scale: _scale,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  AnimatedBuilder(
-                    animation: _ctrl,
-                    builder: (_, __) => CustomPaint(
-                      size: const Size(240, 240),
-                      painter: _ParticlePainter(_particles, _ctrl.value),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 28),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0x33F59E0B), Color(0x1AFBBF24)],
-                      ),
-                      border: Border.all(color: AppColors.gold, width: 1.5),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: const [BoxShadow(color: Color(0x55F59E0B), blurRadius: 24)],
-                    ),
+          color: Colors.black.withValues(alpha: 0.7),
+          child: Stack(
+            children: [
+              const ConfettiEffect(),
+              Center(
+                child: ScaleTransition(
+                  scale: _scale,
+                  child: GlassCard(
+                    variant: GlassCardVariant.gold,
+                    margin: const EdgeInsets.all(AppSpacing.xl),
+                    padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 32),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -247,51 +224,47 @@ class _WinnerOverlayState extends State<_WinnerOverlay> with SingleTickerProvide
                           style: AppTextStyles.label.copyWith(
                             color: AppColors.gold,
                             letterSpacing: 2,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        AvatarIcon(id: player.avatarId, size: 48),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 24),
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.gold, width: 2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.gold.withValues(alpha: 0.3),
+                                blurRadius: 12,
+                              ),
+                            ],
+                          ),
+                          child: AvatarIcon(id: player.avatarId, size: 80),
+                        ),
+                        const SizedBox(height: 20),
                         Text(
                           widget.winner,
-                          style: AppTextStyles.display.copyWith(color: Colors.white, fontSize: 32),
+                          style: AppTextStyles.display.copyWith(
+                            color: AppColors.textPrimary,
+                            fontSize: 38,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        ArbitroButton(
+                          label: 'FECHAR',
+                          onPressed: widget.onDismiss,
+                          variant: ArbitroButtonVariant.primary,
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
     );
   }
-}
-
-class _Particle {
-  _Particle({required this.angle, required this.speed, required this.radius, required this.color});
-  final double angle;
-  final double speed;
-  final double radius;
-  final Color color;
-}
-
-class _ParticlePainter extends CustomPainter {
-  _ParticlePainter(this.particles, this.t);
-  final List<_Particle> particles;
-  final double t;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    for (final p in particles) {
-      final dist = p.speed * t;
-      final pos = center + Offset(cos(p.angle) * dist, sin(p.angle) * dist);
-      canvas.drawCircle(pos, p.radius * (1 - t * 0.5), Paint()..color = p.color.withAlpha((255 * (1 - t)).toInt()));
-    }
-  }
-
-  @override
-  bool shouldRepaint(_ParticlePainter old) => old.t != t;
 }

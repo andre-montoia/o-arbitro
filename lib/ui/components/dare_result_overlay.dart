@@ -125,7 +125,11 @@ class _DareResultOverlayState extends State<DareResultOverlay>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Outcome icon with glow
+                    SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Outcome icon with glow
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -188,6 +192,19 @@ class _DareResultOverlayState extends State<DareResultOverlay>
                           : ArbitroButtonVariant.destructive,
                       fullWidth: true,
                     ),
+                    SizedBox(height: AppSpacing.md * AppSpacing.fontScale(context)),
+                    ArbitroButton(
+                      label: 'VER MAIS OPÇÕES DE DESAFIO',
+                      onPressed: () {
+                        // TODO: Implement expanded dare options logic
+                        print('Showing expanded dare options');
+                      },
+                      variant: ArbitroButtonVariant.ghost,
+                      fullWidth: true,
+                    ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -201,6 +218,7 @@ class _DareResultOverlayState extends State<DareResultOverlay>
 
 class _Particle extends StatelessWidget {
   const _Particle({
+    super.key,
     required this.animation,
     required this.angle,
     required this.color,

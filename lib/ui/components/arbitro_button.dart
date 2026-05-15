@@ -4,7 +4,7 @@ import '../theme/app_text_styles.dart';
 import '../theme/app_spacing.dart';
 import '../../services/haptic_service.dart';
 
-enum ArbitroButtonVariant { primary, secondary, ghost, destructive }
+enum ArbitroButtonVariant { primary, secondary, ghost, destructive, emerald }
 
 class ArbitroButton extends StatefulWidget {
   const ArbitroButton({
@@ -47,7 +47,8 @@ class _ArbitroButtonState extends State<ArbitroButton> {
         onTapCancel: isDisabled ? null : () => setState(() => _pressed = false),
         child: AnimatedScale(
           scale: _pressed ? 0.95 : 1.0,
-          duration: const Duration(milliseconds: 80),
+          duration: const Duration(milliseconds: 120), // Research: 100-150ms for premium feel
+          curve: Cubic(0.23, 1, 0.32, 1), // Research: premium snap curve
           child: _buildInner(),
         ),
       ),
@@ -65,6 +66,7 @@ class _ArbitroButtonState extends State<ArbitroButton> {
       ArbitroButtonVariant.secondary   => _SecondaryButton(label: widget.label, isLoading: widget.isLoading),
       ArbitroButtonVariant.ghost       => _GhostButton(label: widget.label, isLoading: widget.isLoading),
       ArbitroButtonVariant.destructive => _DestructiveButton(label: widget.label, isLoading: widget.isLoading),
+      ArbitroButtonVariant.emerald      => _EmeraldButton(label: widget.label, isLoading: widget.isLoading),
     };
   }
 }
@@ -160,5 +162,24 @@ class _DestructiveButton extends StatelessWidget {
     child: isLoading
         ? const _LoadingIndicator()
         : Text(label, style: AppTextStyles.button.copyWith(color: AppColors.danger), textAlign: TextAlign.center),
+  );
+}
+
+class _EmeraldButton extends StatelessWidget {
+  const _EmeraldButton({required this.label, required this.isLoading});
+  final String label;
+  final bool isLoading;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+    decoration: BoxDecoration(
+      gradient: AppColors.gradientSuccess,
+      borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+      boxShadow: AppSpacing.glowEmerald(intensity: 0.35),
+    ),
+    child: isLoading
+        ? const _LoadingIndicator()
+        : Text(label, style: AppTextStyles.button, textAlign: TextAlign.center),
   );
 }
