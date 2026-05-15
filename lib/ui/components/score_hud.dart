@@ -127,13 +127,7 @@ class _ScoreHudState extends State<ScoreHud> with TickerProviderStateMixin {
                       width: isActive ? 2 : 1,
                     ),
                     boxShadow: isActive
-                        ? [
-                            BoxShadow(
-                              color: AppColors.gold.withValues(alpha: 0.2),
-                              blurRadius: 8,
-                              spreadRadius: -2,
-                            ),
-                          ]
+                        ? AppSpacing.glowGold(intensity: 0.25)
                         : null,
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

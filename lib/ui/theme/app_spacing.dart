@@ -98,4 +98,73 @@ abstract final class AppSpacing {
     if (w < AppBreakpoints.largePhone) return 4;
     return 5;
   }
+
+  // ═══════════════════════════════════════════════════════════
+  // NEON GLOW — Colored shadow presets for the design system
+  // ═══════════════════════════════════════════════════════════
+
+  static List<BoxShadow> glowPurple({double intensity = 0.4}) => [
+        BoxShadow(
+          color: const Color(0xFF7C3AED).withValues(alpha: intensity),
+          blurRadius: 20,
+          spreadRadius: -2,
+        ),
+        BoxShadow(
+          color: const Color(0xFF7C3AED).withValues(alpha: intensity * 0.5),
+          blurRadius: 40,
+          spreadRadius: -8,
+        ),
+      ];
+
+  static List<BoxShadow> glowGold({double intensity = 0.4}) => [
+        BoxShadow(
+          color: const Color(0xFFF59E0B).withValues(alpha: intensity),
+          blurRadius: 16,
+          spreadRadius: -2,
+        ),
+        BoxShadow(
+          color: const Color(0xFFF59E0B).withValues(alpha: intensity * 0.4),
+          blurRadius: 32,
+          spreadRadius: -8,
+        ),
+      ];
+
+  static List<BoxShadow> glowPink({double intensity = 0.4}) => [
+        BoxShadow(
+          color: const Color(0xFFEC4899).withValues(alpha: intensity),
+          blurRadius: 16,
+          spreadRadius: -2,
+        ),
+        BoxShadow(
+          color: const Color(0xFFEC4899).withValues(alpha: intensity * 0.4),
+          blurRadius: 32,
+          spreadRadius: -8,
+        ),
+      ];
+
+  static List<BoxShadow> glowEmerald({double intensity = 0.4}) => [
+        BoxShadow(
+          color: const Color(0xFF10B981).withValues(alpha: intensity),
+          blurRadius: 16,
+          spreadRadius: -2,
+        ),
+        BoxShadow(
+          color: const Color(0xFF10B981).withValues(alpha: intensity * 0.4),
+          blurRadius: 32,
+          spreadRadius: -8,
+        ),
+      ];
+
+  static List<BoxShadow> glowDanger({double intensity = 0.4}) => [
+        BoxShadow(
+          color: const Color(0xFFEF4444).withValues(alpha: intensity),
+          blurRadius: 16,
+          spreadRadius: -2,
+        ),
+        BoxShadow(
+          color: const Color(0xFFEF4444).withValues(alpha: intensity * 0.4),
+          blurRadius: 32,
+          spreadRadius: -8,
+        ),
+      ];
 }

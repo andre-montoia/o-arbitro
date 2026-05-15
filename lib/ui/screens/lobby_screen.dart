@@ -7,6 +7,8 @@ import '../components/glass_card.dart';
 import '../components/arbitro_badge.dart';
 import '../components/arbitro_button.dart';
 import '../components/player_setup_sheet.dart';
+import '../components/avatar_icon.dart';
+import 'session_recap_screen.dart';
 
 class LobbyScreen extends StatelessWidget {
   const LobbyScreen({super.key});
@@ -80,13 +82,24 @@ class LobbyScreen extends StatelessWidget {
                     _NoSessionBanner(onStart: () => _showSetup(context)),
                   ] else ...[
                     _SessionBanner(
-                      players: state.session!.players.map((p) => p.name).toList(),
+                      players: state.session!.players,
                       onReset: () => _confirmReset(context),
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     const _FeaturedCard(),
                     const SizedBox(height: AppSpacing.md),
                     const _SecondaryGrid(),
+                    const SizedBox(height: AppSpacing.xl),
+                    ArbitroButton(
+                      label: 'TERMINAR SESSÃO',
+                      variant: ArbitroButtonVariant.ghost,
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const SessionRecapScreen()),
+                        );
+                      },
+                      fullWidth: true,
+                    ),
                   ],
                 ],
               ),
@@ -122,13 +135,7 @@ class _AppBar extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: AppColors.gradientPrimary,
           shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadowPurple,
-              blurRadius: 12,
-              spreadRadius: -2,
-            ),
-          ],
+          boxShadow: AppSpacing.glowPurple(intensity: 0.4),
         ),
         child: const Icon(Icons.sports_martial_arts, color: Colors.white, size: 20),
       ),
@@ -163,7 +170,7 @@ class _NoSessionBanner extends StatelessWidget {
 
 class _SessionBanner extends StatelessWidget {
   const _SessionBanner({required this.players, required this.onReset});
-  final List<String> players;
+  final List<Player> players;
   final VoidCallback onReset;
 
   @override
@@ -175,15 +182,45 @@ class _SessionBanner extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Sessão activa', style: AppTextStyles.label),
-              const SizedBox(height: AppSpacing.xs),
-              Text(players.join(' · '), style: AppTextStyles.bodyStrong),
+              const SizedBox(height: AppSpacing.sm),
+              Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.xs,
+                children: players.map((p) => _PlayerChip(player: p)).toList(),
+              ),
             ],
           ),
         ),
         GestureDetector(
           onTap: onReset,
-          child: const Icon(Icons.refresh_rounded, color: AppColors.textMuted),
+          child: const Padding(
+            padding: EdgeInsets.all(AppSpacing.sm),
+            child: Icon(Icons.refresh_rounded, color: AppColors.textMuted),
+          ),
         ),
+      ],
+    ),
+  );
+}
+
+class _PlayerChip extends StatelessWidget {
+  const _PlayerChip({required this.player});
+  final Player player;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    decoration: BoxDecoration(
+      color: AppColors.surface3,
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(color: AppColors.border, width: 0.5),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AvatarIcon(id: player.avatarId, size: 14),
+        const SizedBox(width: 6),
+        Text(player.name, style: AppTextStyles.bodyStrong.copyWith(fontSize: 12)),
       ],
     ),
   );

@@ -63,5 +63,32 @@ abstract final class AppTheme {
         TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
       },
     ),
+    bottomSheetTheme: const BottomSheetThemeData(
+      backgroundColor: AppColors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.modalRadius)),
+      ),
+      elevation: 0,
+      modalBarrierColor: Color(0x8006060E),
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: AppColors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.modalRadius),
+      ),
+      elevation: 24,
+      shadowColor: AppColors.shadowDark,
+      titleTextStyle: AppTextStyles.heading,
+      contentTextStyle: AppTextStyles.body,
+    ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: AppColors.surface2,
+      contentTextStyle: AppTextStyles.body,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+      ),
+      behavior: SnackBarBehavior.floating,
+      elevation: 8,
+    ),
   );
 }

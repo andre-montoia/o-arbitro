@@ -76,8 +76,8 @@ class _LoadingIndicator extends StatelessWidget {
   Widget build(BuildContext context) => const Padding(
     padding: EdgeInsets.symmetric(horizontal: 28, vertical: 12),
     child: SizedBox(
-      width: 24, // Adjust size as needed
-      height: 24, // Adjust size as needed
+      width: 24,
+      height: 24,
       child: CircularProgressIndicator(
         color: AppColors.textPrimary,
         strokeWidth: 2.5,
@@ -90,12 +90,14 @@ class _GradientButton extends StatelessWidget {
   const _GradientButton({required this.label, required this.isLoading});
   final String label;
   final bool isLoading;
+
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
     decoration: BoxDecoration(
       gradient: AppColors.gradientPrimary,
       borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+      boxShadow: AppSpacing.glowPurple(intensity: 0.35),
     ),
     child: isLoading
         ? const _LoadingIndicator()
@@ -107,6 +109,7 @@ class _SecondaryButton extends StatelessWidget {
   const _SecondaryButton({required this.label, required this.isLoading});
   final String label;
   final bool isLoading;
+
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
@@ -114,6 +117,7 @@ class _SecondaryButton extends StatelessWidget {
       color: const Color(0x267C3AED),
       borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
       border: Border.all(color: const Color(0x4DA855F7)),
+      boxShadow: AppSpacing.glowPurple(intensity: 0.15),
     ),
     child: isLoading
         ? const _LoadingIndicator()
@@ -125,6 +129,7 @@ class _GhostButton extends StatelessWidget {
   const _GhostButton({required this.label, required this.isLoading});
   final String label;
   final bool isLoading;
+
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
@@ -142,6 +147,7 @@ class _DestructiveButton extends StatelessWidget {
   const _DestructiveButton({required this.label, required this.isLoading});
   final String label;
   final bool isLoading;
+
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
@@ -149,6 +155,7 @@ class _DestructiveButton extends StatelessWidget {
       color: const Color(0x26EF4444),
       borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
       border: Border.all(color: const Color(0x4DEF4444)),
+      boxShadow: AppSpacing.glowDanger(intensity: 0.2),
     ),
     child: isLoading
         ? const _LoadingIndicator()

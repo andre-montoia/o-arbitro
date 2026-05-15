@@ -6,6 +6,7 @@ import '../theme/app_spacing.dart';
 import '../components/arbitro_button.dart';
 import '../components/arbitro_input.dart';
 import '../components/roulette_wheel.dart';
+import '../components/avatar_icon.dart';
 import '../../models/session_state.dart';
 import '../../models/roulette_result.dart';
 import '../../models/ledger_entry.dart';
@@ -107,10 +108,24 @@ class _RouletteScreenState extends State<RouletteScreen> {
                     if (_lastWinner != null)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 12),
-                        child: Text(
-                          'Última volta: $_lastWinner',
-                          style: AppTextStyles.body.copyWith(color: AppColors.gold),
-                          textAlign: TextAlign.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Última volta: ',
+                              style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                              textAlign: TextAlign.center,
+                            ),
+                            AvatarIcon(
+                              id: SessionState.of(context).session!.players.firstWhere((p) => p.name == _lastWinner).avatarId,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              _lastWinner!,
+                              style: AppTextStyles.bodyStrong.copyWith(color: AppColors.gold),
+                            ),
+                          ],
                         ),
                       ),
                     Center(
@@ -190,6 +205,9 @@ class _WinnerOverlayState extends State<_WinnerOverlay> with SingleTickerProvide
 
   @override
   Widget build(BuildContext context) {
+    final session = SessionState.of(context).session!;
+    final player = session.players.firstWhere((p) => p.name == widget.winner);
+
     return GestureDetector(
       onTap: widget.onDismiss,
       child: FadeTransition(
@@ -231,6 +249,8 @@ class _WinnerOverlayState extends State<_WinnerOverlay> with SingleTickerProvide
                             letterSpacing: 2,
                           ),
                         ),
+                        const SizedBox(height: 16),
+                        AvatarIcon(id: player.avatarId, size: 48),
                         const SizedBox(height: 12),
                         Text(
                           widget.winner,

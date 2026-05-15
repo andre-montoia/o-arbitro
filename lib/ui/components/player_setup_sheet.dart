@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import '../../models/player.dart';
 import '../../models/session.dart';
 import '../../models/session_state.dart';
+import '../../services/haptic_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../theme/app_spacing.dart';
 import 'arbitro_button.dart';
 import 'arbitro_input.dart';
 import 'bottom_sheet_handle.dart';
+import 'avatar_icon.dart';
 
 class PlayerSetupSheet extends StatefulWidget {
   const PlayerSetupSheet({super.key});
@@ -21,22 +23,44 @@ class _PlayerSetupSheetState extends State<PlayerSetupSheet> {
     TextEditingController(),
     TextEditingController(),
   ];
+  final List<String> _avatars = [
+    'default',
+    'default',
+  ];
+  
+  final List<String> _availableAvatars = [
+    'default', 'ace', 'joker', 'king', 'shadow', 'spark', 'guard', 'seer', 'gambler'
+  ];
+
   String? _error;
 
   void _addPlayer() {
     if (_controllers.length >= 8) return;
+    HapticService.instance.light();
     setState(() {
       _error = null;
       _controllers.add(TextEditingController());
+      _avatars.add('default');
     });
   }
 
   void _removePlayer(int index) {
     if (_controllers.length <= 2) return;
+    HapticService.instance.light();
     setState(() {
       _error = null;
       _controllers[index].dispose();
       _controllers.removeAt(index);
+      _avatars.removeAt(index);
+    });
+  }
+
+  void _changeAvatar(int index) {
+    final current = _avatars[index];
+    final nextIdx = (_availableAvatars.indexOf(current) + 1) % _availableAvatars.length;
+    HapticService.instance.selection();
+    setState(() {
+      _avatars[index] = _availableAvatars[nextIdx];
     });
   }
 
@@ -57,7 +81,14 @@ class _PlayerSetupSheetState extends State<PlayerSetupSheet> {
       return;
     }
 
-    final players = names.map((n) => Player(name: n)).toList();
+    final players = <Player>[];
+    for (int i = 0; i < names.length; i++) {
+      players.add(Player(
+        name: names[i],
+        avatarId: _avatars[i],
+      ));
+    }
+    
     final session = Session(players: players);
     SessionState.of(context).startSession(session);
     Navigator.of(context).pop();
@@ -89,6 +120,22 @@ class _PlayerSetupSheetState extends State<PlayerSetupSheet> {
                   padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                   child: Row(
                     children: [
+                      GestureDetector(
+                        onTap: () => _changeAvatar(i),
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: AppColors.surface3,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.border, width: 1),
+                          ),
+                          child: Center(
+                            child: AvatarIcon(id: _avatars[i]),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: ArbitroInput(
                           controller: _controllers[i],

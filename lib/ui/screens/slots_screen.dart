@@ -12,6 +12,7 @@ import '../components/dare_timer_card.dart';
 import '../components/dare_vote_card.dart';
 import '../components/glass_card.dart';
 import '../components/slot_machine.dart';
+import '../components/avatar_icon.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text_styles.dart';
@@ -242,11 +243,24 @@ class _SlotsScreenState extends State<SlotsScreen> {
                                 style: AppTextStyles.label.copyWith(
                                     color: AppColors.textContrast),
                               ),
-                              Text(
-                                '$_announcedPlayer!',
-                                style: AppTextStyles.display.copyWith(
-                                    fontSize: 42, color: AppColors.gold),
-                                textAlign: TextAlign.center,
+                              const SizedBox(height: AppSpacing.sm),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  AvatarIcon(
+                                    id: session.players.firstWhere((p) => p.name == _announcedPlayer).avatarId,
+                                    size: 32,
+                                  ),
+                                  const SizedBox(width: AppSpacing.md),
+                                  Flexible(
+                                    child: Text(
+                                      '$_announcedPlayer!',
+                                      style: AppTextStyles.display.copyWith(
+                                          fontSize: 36, color: AppColors.gold),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -277,7 +291,14 @@ class _SlotsScreenState extends State<SlotsScreen> {
                       borderRadius: BorderRadius.circular(100),
                       border: Border.all(color: AppColors.border),
                     ),
-                    child: Text(p.name, style: AppTextStyles.caption.copyWith(color: AppColors.textPrimary)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AvatarIcon(id: p.avatarId, size: 14),
+                        const SizedBox(width: 8),
+                        Text(p.name, style: AppTextStyles.caption.copyWith(color: AppColors.textPrimary)),
+                      ],
+                    ),
                   )).toList(),
                 ),
               ] else

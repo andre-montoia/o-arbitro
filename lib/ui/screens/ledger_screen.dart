@@ -8,6 +8,7 @@ import '../theme/app_spacing.dart';
 import '../components/glass_card.dart';
 import '../components/arbitro_button.dart';
 import '../components/new_ledger_entry_sheet.dart';
+import '../components/avatar_icon.dart';
 
 // Duration for the slide-in animation when a new entry is added
 const _kEntryAnimDuration = Duration(milliseconds: 400);
@@ -180,6 +181,8 @@ class _Leaderboard extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: AppSpacing.xs),
                 child: Row(
                   children: [
+                    AvatarIcon(id: p.avatarId, size: 16),
+                    const SizedBox(width: AppSpacing.sm),
                     Text(p.name, style: AppTextStyles.bodyStrong),
                     const Spacer(),
                     Text('${p.daresCompleted} desafios',
@@ -474,31 +477,30 @@ class _ScoreCard extends StatelessWidget {
   const _ScoreCard({required this.score});
   final ScoreEntry score;
 
-  String get _sourceIcon => switch (score.source) {
-        ScoreSource.slots => '🎰',
-        ScoreSource.roulette => '🎡',
-        ScoreSource.manual => '✏️',
-      };
-
   @override
-  Widget build(BuildContext context) => GlassCard(
-        child: Row(
-          children: [
-            Text(_sourceIcon, style: const TextStyle(fontSize: 20)),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(score.player, style: AppTextStyles.bodyStrong),
-                  Text(score.description, style: AppTextStyles.caption),
-                ],
-              ),
+  Widget build(BuildContext context) {
+    final session = SessionState.of(context).session!;
+    final player = session.players.firstWhere((p) => p.name == score.player);
+
+    return GlassCard(
+      child: Row(
+        children: [
+          AvatarIcon(id: player.avatarId, size: 20),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(score.player, style: AppTextStyles.bodyStrong),
+                Text(score.description, style: AppTextStyles.caption),
+              ],
             ),
-            Text('+1',
-                style:
-                    AppTextStyles.heading.copyWith(color: AppColors.success)),
-          ],
-        ),
-      );
+          ),
+          Text('+1',
+              style:
+                  AppTextStyles.heading.copyWith(color: AppColors.success)),
+        ],
+      ),
+    );
+  }
 }
