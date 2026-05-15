@@ -12,7 +12,8 @@ import '../components/avatar_icon.dart';
 import 'session_recap_screen.dart';
 
 class LobbyScreen extends StatelessWidget {
-  const LobbyScreen({super.key});
+  final void Function(int)? onGameSelected;
+  const LobbyScreen({super.key, this.onGameSelected});
 
   void _showSetup(BuildContext context) {
     final sessionState = SessionState.of(context);
@@ -87,9 +88,12 @@ class LobbyScreen extends StatelessWidget {
                       onReset: () => _confirmReset(context),
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    const _FeaturedCard(),
+                    GestureDetector(
+                      onTap: () => widget.onGameSelected?.call(1),
+                      child: const _FeaturedCard(),
+                    ),
                     const SizedBox(height: AppSpacing.md),
-                    const _SecondaryGrid(),
+                    _GamesGrid(onGameSelected: onGameSelected),
                     const SizedBox(height: AppSpacing.xl),
                     ArbitroButton(
                       label: 'TERMINAR SESSÃO',
@@ -255,41 +259,45 @@ class _FeaturedCard extends StatelessWidget {
   );
 }
 
-class _SecondaryGrid extends StatelessWidget {
-  const _SecondaryGrid();
+class _GamesGrid extends StatelessWidget {
+  final void Function(int)? onGameSelected;
+  const _GamesGrid({this.onGameSelected});
+
+  static const _games = [
+    (emoji: '🎡', title: 'Roleta do Destino', subtitle: 'Destino', index: 2),
+    (emoji: '📜', title: 'Absurdity Ledger', subtitle: 'Apostas', index: 3),
+    (emoji: '👥', title: 'Most Likely', subtitle: 'Votação', index: 4),
+    (emoji: '⚡', title: 'Speed Dare', subtitle: '30s timer', index: 5),
+    (emoji: '👆', title: 'Never Have I Ever', subtitle: 'Finger tracking', index: 6),
+    (emoji: '🤔', title: 'Would You Rather', subtitle: 'A/B voting', index: 7),
+    (emoji: '🔄', title: 'Truth or Dare Wheel', subtitle: 'Spin-to-win', index: 8),
+  ];
 
   @override
-  Widget build(BuildContext context) => const Row(
-    children: [
-      Expanded(
-        child: GlassCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('🎡', style: TextStyle(fontSize: 32)),
-              SizedBox(height: AppSpacing.sm),
-              Text('Roleta do Destino', style: AppTextStyles.bodyStrong),
-              SizedBox(height: AppSpacing.xs),
-              Text('Destino', style: AppTextStyles.caption),
-            ],
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: AppSpacing.md,
+      runSpacing: AppSpacing.md,
+      children: _games.map((game) {
+        return SizedBox(
+          width: (MediaQuery.of(context).size.width - AppSpacing.screenPadding(context) * 2 - AppSpacing.md) / 2,
+          child: GestureDetector(
+            onTap: () => onGameSelected?.call(game.index),
+            child: GlassCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(game.emoji, style: const TextStyle(fontSize: 32)),
+                  SizedBox(height: AppSpacing.sm),
+                  Text(game.title, style: AppTextStyles.bodyStrong),
+                  SizedBox(height: AppSpacing.xs),
+                  Text(game.subtitle, style: AppTextStyles.caption),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
-      SizedBox(width: AppSpacing.md),
-      Expanded(
-        child: GlassCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('📜', style: TextStyle(fontSize: 32)),
-              SizedBox(height: AppSpacing.sm),
-              Text('Absurdity Ledger', style: AppTextStyles.bodyStrong),
-              SizedBox(height: AppSpacing.xs),
-              Text('Apostas', style: AppTextStyles.caption),
-            ],
-          ),
-        ),
-      ),
-    ],
-  );
+        );
+      }).toList(),
+    );
+  }
 }

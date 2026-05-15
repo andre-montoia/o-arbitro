@@ -110,7 +110,9 @@ class _AppRouterState extends State<AppRouter> {
   }
 
   Widget _buildScreen() {
-    if (_index == 0) return const LobbyScreen();
+    if (_index == 0) return LobbyScreen(
+      onGameSelected: (i) => setState(() => _index = i),
+    );
     if (_session == null) return _LockedScreen(tabIndex: _index);
     return switch (_index) {
       1 => const SlotsScreen(),
